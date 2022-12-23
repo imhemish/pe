@@ -14,6 +14,7 @@ ap.add_argument("--remark", "-R", metavar='"babe this is for you"', nargs=1, req
 ap.add_argument("--balance", '-b', action='store_true', help="Print remaining balance (requires PIN)")
 ap.add_argument("--list-modems", '-l', action='store_true', help="List all available modems")
 ap.add_argument("--modem", '-m', metavar='1', help="Modem to use (not required if there is only 1 modem)", nargs=1)
+ap.add_argument("--determine-digits", '-d', action='store_true', help="Determine number of digits in PIN")
 # ---------------------------------
 
 
@@ -78,7 +79,7 @@ def send_money_to_upi_id(id, amount, pin, ussd_iface, remark='1'):
         pass
 
     # the upi id can not be sent in combined code
-    req = str(ussd_iface.Initiate(f"*99*1*3#"))
+    req = str(ussd_iface.Initiate("*99*1*3#"))
 
     if "Enter UPI" in req:
         sleep(0.01)
@@ -156,6 +157,25 @@ def check_balance(pin, ussd_iface):
     
     balance = output[(output.find("Your account balance is Rs. ")+28):]
     return balance
+
+def determine_digits_in_pin(ussd_iface):
+    # Cancel any previously running USSD request
+    try:
+        ussd_iface.Cancel()
+    except:
+        pass
+
+    req = str(ussd_iface.Initiate("*99*3#"))
+    
+    if "Enter" in req:
+        shortened_req = req[(req.find("Enter ")+6):]
+        return shortened_req[:shortened_req.find(" digit")]
+
+    else:
+        raise Exception("Some error occured")
+    
+    balance = output[(output.find("Your account balance is Rs. ")+28):]
+    return balance
     
 def main():
     bus = dbus.SystemBus()
@@ -167,6 +187,7 @@ def main():
     if args.list_modems:
         for item in modems:
             print(item)
+        exit() # Because if there is no modem, and user just wants to see if there is a modem or not, next block of code which chooses modem, fails raising an exception
     
     modems = list_modems(bus)
 
@@ -208,5 +229,9 @@ def main():
             raise Exception("pin not provided")
         else:
             print(check_balance(args.pin[0], ussd))
+    
+    elif args.determine_digits:
+        print(determine_digits_in_pin(ussd))
+
 if __name__ == "__main__":
     main()
