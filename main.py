@@ -12,6 +12,8 @@ ap.add_argument("--amount", '-A', metavar='100', nargs=1, required=False, help="
 ap.add_argument("--pin", '-p', metavar='****', nargs=1, required=False, help="UPI pin")
 ap.add_argument("--remark", "-R", metavar='"babe this is for you"', nargs=1, required=False, help="Remark to add (optional)")
 ap.add_argument("--balance", '-b', action='store_true', help="Print remaining balance (requires PIN)")
+ap.add_argument("--pending-request", '-P', action='store_true', help="Print last pending request with receiver and amount")
+ap.add_argument("--reject-request", action='store_true', help="Reject last pending request")
 ap.add_argument("--list-modems", '-l', action='store_true', help="List all available modems")
 ap.add_argument("--modem", '-m', metavar='1', help="Modem to use (not required if there is only 1 modem)", nargs=1)
 ap.add_argument("--determine-digits", '-d', action='store_true', help="Determine number of digits in PIN")
@@ -30,14 +32,15 @@ def list_modems(bus):
         modems.append(child.attrib['name'])
     return modems
 
-def send_money_to_number(number, amount, pin, ussd_iface, remark='1'):
-    
+def clear_requests(ussd_iface):
     # Cancel any previously running USSD request
     try:
         ussd_iface.Cancel()
     except:
         pass
 
+def send_money_to_number(number, amount, pin, ussd_iface, remark='1'):
+    clear_requests(ussd_iface)
     # If request is not failed, enter pin
     req = str(ussd_iface.Initiate(f"*99*1*1*{number}*{amount}*{remark}#"))
     
@@ -71,12 +74,7 @@ def send_money_to_number(number, amount, pin, ussd_iface, remark='1'):
         raise Exception("Some error occured")
     
 def send_money_to_upi_id(id, amount, pin, ussd_iface, remark='1'):
-    
-    # Cancel any previously running USSD request
-    try:
-        ussd_iface.Cancel()
-    except:
-        pass
+    clear_requests(ussd_iface)
 
     # the upi id can not be sent in combined code
     req = str(ussd_iface.Initiate("*99*1*3#"))
@@ -133,12 +131,7 @@ def send_money_to_upi_id(id, amount, pin, ussd_iface, remark='1'):
         raise Exception("Some error occured")
 
 def check_balance(pin, ussd_iface):
-    
-    # Cancel any previously running USSD request
-    try:
-        ussd_iface.Cancel()
-    except:
-        pass
+    clear_requests(ussd_iface)
 
     req = str(ussd_iface.Initiate("*99*3#"))
     
@@ -159,12 +152,9 @@ def check_balance(pin, ussd_iface):
     return balance
 
 def determine_digits_in_pin(ussd_iface):
-    # Cancel any previously running USSD request
-    try:
-        ussd_iface.Cancel()
-    except:
-        pass
+    clear_requests(ussd_iface)
 
+    # The service tells the digits in check balance function in form "Enter * digit..."
     req = str(ussd_iface.Initiate("*99*3#"))
     
     if "Enter" in req:
@@ -177,6 +167,53 @@ def determine_digits_in_pin(ussd_iface):
     balance = output[(output.find("Your account balance is Rs. ")+28):]
     return balance
     
+def last_pending_request(ussd_iface):
+    # If there are multiple requests, it returns the recent one only
+    # Also, it does not return any 'note' or remark
+    clear_requests(ussd_iface)
+
+    req = str(ussd_iface.Initiate("*99*5#"))
+    
+    if "You do not have any requests pending" in req:
+        return None
+    elif ("Enter your" in req) and ("to pay" in req):
+        reduced_req = req[(req.find("to pay ")+7):]
+        receiver = reduced_req[:reduced_req.find(" Rs.")]
+        red_red_req = reduced_req[(reduced_req.find(" Rs.")+4):]
+        amount = red_red_req[:red_red_req.find("\n")]
+        return {"receiver": receiver, "amount": amount}
+    else:
+        raise Exception("Some error occured")
+
+def reject_last_pending_request(ussd_iface):
+    clear_requests(ussd_iface)
+
+    req = str(ussd_iface.Initiate("*99*5#"))
+
+    if "You do not have any requests pending" in req:
+        raise Exception("no pending request")
+    
+    elif ("Enter your" in req) and ("to pay" in req):
+
+        # Respond 2 to reject
+        output = ussd_iface.Respond("2")
+        if "Reject this txn" in output:
+            output2 = ussd_iface.Respond("1")
+        else:
+            raise Exception("Some error occured")
+    
+    else:
+        raise Exception("Some error occured")
+    
+    
+    if "You have declined" in output2:
+        reduced_output = output2[(output2.find("(RefId: ")+8):]
+        refid = reduced_output[:reduced_output.find(")")]
+        return {"refid": refid}
+    else:
+        raise Exception("Some error occured")
+
+
 def main():
     bus = dbus.SystemBus()
     args = ap.parse_args()
@@ -232,6 +269,12 @@ def main():
     
     elif args.determine_digits:
         print(determine_digits_in_pin(ussd))
+    
+    if args.pending_request:
+        print(last_pending_request(ussd))
+    if args.reject_request:
+        print(reject_last_pending_request(ussd))
+    
 
 if __name__ == "__main__":
     main()
