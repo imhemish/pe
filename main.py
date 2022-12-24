@@ -7,7 +7,7 @@ from time import sleep
 ap = ArgumentParser('upi-ussd', description="Use NPCI's USSD UPI service via Modem")
 ap.add_argument("--send", '-s', action='store_true', required=False, help="Send Money")
 ap.add_argument("--receive", '-r', action='store_true', required=False, help="Receive Money")
-ap.add_argument("--address", '-a', metavar='upi/number', nargs=1, required=False, help="UPI ID or number to send/receive from")
+ap.add_argument("--address", '-a', metavar='upi/number', required=False, nargs=1, help="UPI ID or number to send/receive from")
 ap.add_argument("--amount", '-A', metavar='100', nargs=1, required=False, help="Amount of money to send/receive")
 ap.add_argument("--pin", '-p', metavar='****', nargs=1, required=False, help="UPI pin")
 ap.add_argument("--remark", "-R", metavar='"babe this is for you"', nargs=1, required=False, help="Remark to add (optional)")
@@ -95,13 +95,15 @@ def send_money_to_upi_id(id, amount, pin, ussd_iface, remark='1'):
             if "Enter a remark" in req:
                 sleep(0.01)
                 req = ussd_iface.Respond(remark)
-
-                # Invalid amount
-                if "not a valid" in req:
-                    raise Exception("")
-                elif "You are paying to" in req:
+                if "You are paying to" in req:
                     sleep(0.01)
                     output = ussd_iface.Respond(pin)
+                else:
+                    raise Exception("Some error occured")
+            # Invalid amount
+            elif "not a valid" in req:
+                    raise Exception("")
+                
             else:
                 raise Exception("Some error occured")
             
@@ -130,6 +132,58 @@ def send_money_to_upi_id(id, amount, pin, ussd_iface, remark='1'):
 
         raise Exception("Some error occured")
 
+def receive_from_upi_id(id, amount, ussd_iface, remark='1'):
+    clear_requests(ussd_iface)
+
+    # the upi id can not be sent in combined code
+    req = str(ussd_iface.Initiate("*99*2#"))
+    if "UPI ID" in req:
+        sleep(0.01)
+        req = str(ussd_iface.Respond(id))
+
+        # Found experimentally
+        if "TRANSACTION DECLINED" in req:
+            raise Exception("Invalid UPI id or UPI id does not exist")
+        elif "Collecting from " in req:
+            # Just after "Collecting from " is the name of receiver, before a newline
+            name = req[16: req.find("\n")]
+            sleep(0.01)
+            req = str(ussd_iface.Respond(amount))
+
+            if "Enter a remark" in req:
+                sleep(0.01)
+                req = ussd_iface.Respond(remark)
+                if "You are requesting" in req:
+                    sleep(0.01)
+                    # Enter 1 to confirm
+                    output = ussd_iface.Respond("1")
+                else:
+                    raise Exception("Some error occured")
+            # Invalid amount
+            elif "not a valid" in req:
+                raise Exception("invalid amount")
+            
+            else:
+                raise Exception("Some error occured")
+            
+        else:
+            raise Exception("Some error occured")
+    
+    else:
+        raise Exception("Some error occured")
+    
+    if "is successful" in output:
+        return {"name": name}
+    else:
+        raise Exception("Some error occured")
+
+def receive_from_phone_number(number, amount, ussd_iface, remark='1'):
+    clear_requests(ussd_iface)
+
+    # the upi id can not be sent in combined code
+    req = str(ussd_iface.Initiate(f"*99*2*{number}*#"))
+    # To be completed
+    
 def check_balance(pin, ussd_iface):
     clear_requests(ussd_iface)
 
@@ -225,8 +279,6 @@ def main():
         for item in modems:
             print(item)
         exit() # Because if there is no modem, and user just wants to see if there is a modem or not, next block of code which chooses modem, fails raising an exception
-    
-    modems = list_modems(bus)
 
     # If there is only 1 modem, then use it, else use the one specified by --modem flag
     if len(modems) == 1:
@@ -261,6 +313,25 @@ def main():
         else:
             raise Exception("Address not provided")
     
+    elif args.receive:
+        # Make a receive request
+        if args.remark == None:
+            remark = '1'
+        else:
+            remark = args.remark[0]
+
+        if args.address != None:
+            # Is a 10 digit mobile number
+            if str(args.address[0]).isdigit():
+                if len(args.address[0]) == 10:
+                    print(receive_from_upi_id(args.address[0], args.amount[0], ussd, remark))
+                else:
+                    raise Exception("not 10 digits")
+            if "@" in str(args.address[0]):
+                print(receive_from_phone_number(args.address[0], args.amount[0], ussd, remark ))
+                
+        else:
+            raise Exception("Address not provided")
     elif args.balance:
         if args.pin == None:
             raise Exception("pin not provided")
