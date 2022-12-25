@@ -181,9 +181,16 @@ def receive_from_phone_number(number, amount, ussd_iface, remark='1'):
     clear_requests(ussd_iface)
 
     # the upi id can not be sent in combined code
-    req = str(ussd_iface.Initiate(f"*99*2*{number}*#"))
-    # To be completed
-    
+    req = str(ussd_iface.Initiate(f"*99*2*{number}*{amount}*{remark}*1#"))
+    if "Beneficiary payment address incorrect" in req:
+        raise Exception("Invalid phone number or is not on UPI")
+    elif "is successful" in req:
+        reduced_output = req[(req.find(" from ")+6):]
+        name = reduced_output[:reduced_output.find(" is successful")]
+        return {"name": name}
+    else:
+        raise Exception("Some error occured")
+
 def check_balance(pin, ussd_iface):
     clear_requests(ussd_iface)
 
@@ -324,11 +331,11 @@ def main():
             # Is a 10 digit mobile number
             if str(args.address[0]).isdigit():
                 if len(args.address[0]) == 10:
-                    print(receive_from_upi_id(args.address[0], args.amount[0], ussd, remark))
+                    print(receive_from_phone_number(args.address[0], args.amount[0], ussd, remark))
                 else:
                     raise Exception("not 10 digits")
             if "@" in str(args.address[0]):
-                print(receive_from_phone_number(args.address[0], args.amount[0], ussd, remark ))
+                print(receive_from_upi_id(args.address[0], args.amount[0], ussd, remark ))
                 
         else:
             raise Exception("Address not provided")
