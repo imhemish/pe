@@ -1,0 +1,2 @@
+blueprint-compiler compile ui/blp/gui.blp > ui/ui/gui.ui
+blueprint-compiler compile ui/blp/home.blp > ui/ui/home.ui
