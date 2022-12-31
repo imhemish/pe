@@ -2,6 +2,7 @@ import sys
 import gi
 import dbus
 import time
+import threading
 
 gi.require_version('Gtk', '4.0')
 gi.require_version('Adw', '1')
@@ -45,8 +46,15 @@ class Application(Adw.Application):
     def _check_balance(self, *args):
         spinner = Gtk.Spinner()
         spinner.start()
-        self.props.active_window.balance_row.spinner = spinner
-        self.props.active_window.balance_row.add_suffix(self.props.active_window.balance_row.spinner)
+
+        # Remove existing child widget, e.g. previous spinner or balance label
+        try:
+            self.props.active_window.balance_row.remove(self.props.active_window.balance_row.child_widget)
+        except:
+            pass
+
+        self.props.active_window.balance_row.child_widget = spinner
+        self.props.active_window.balance_row.add_suffix(self.props.active_window.balance_row.child_widget)
         
         def when_response_given(pinentry, response):
             pin = pinentry.gtk_entry.get_text()
@@ -54,11 +62,16 @@ class Application(Adw.Application):
             label = Gtk.Label()
             label.set_label("₹" + balance)
             spinner.stop()
-            self.props.active_window.balance_row.remove(self.props.active_window.balance_row.spinner)
-            self.props.active_window.balance_row.add_suffix(label)
+            self.props.active_window.balance_row.remove(self.props.active_window.balance_row.child_widget)
+            self.props.active_window.balance_row.child_widget = label
+            self.props.active_window.balance_row.add_suffix(self.props.active_window.balance_row.child_widget)
+        
+        def when_response_given_wrapper_thread(pinentry, response):
+            thread = threading.Thread(group= None, target=when_response_given, kwargs={"pinentry": pinentry, "response": response})
+            thread.start()
 
         pinentry_dialog = PinEntry(self.props.active_window)
-        pinentry_dialog.connect('response', when_response_given)
+        pinentry_dialog.connect('response', when_response_given_wrapper_thread)
         pinentry_dialog.present()
 
     def settings_stack(self, *args):
