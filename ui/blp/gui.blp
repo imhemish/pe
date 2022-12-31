@@ -19,16 +19,23 @@ template ApplicationWindow : Adw.ApplicationWindow {
         orientation: vertical;
 
         Adw.HeaderBar header_bar {
-            centering-policy: strict;
-            Gtk.MenuButton settings_button {
-                icon-name: 'open-menu-symbolic';
-                menu-model: my_menu;
+            Gtk.Button back_button {
+                icon-name: "go-previous-symbolic";
+                action-name: "app.settings_stack";
+                action-target: "app.settings_stack";
             }
+            centering-policy: strict;
 
             title-widget: Adw.ViewSwitcherTitle view_switcher_title {
                 title: "UPI USSD";
                 stack: view_stack;
             };
+        [end]
+        Gtk.MenuButton settings_button {
+                icon-name: 'open-menu-symbolic';
+                menu-model: my_menu;
+            }
+
         }
 
             
@@ -39,7 +46,101 @@ template ApplicationWindow : Adw.ApplicationWindow {
                 name: "home";
                 title: "Home";
                 icon-name: 'user-home-symbolic';
-                child: .HomeBox {};
+                child: Adw.ToastOverlay {Gtk.Stack home_stack {
+                  transition-type: crossfade;
+                  transition-duration: 150;
+    Gtk.StackPage home_stack_settings{
+      name: "settings";
+  child: Adw.PreferencesPage {
+    
+    Adw.PreferencesGroup {
+    Adw.ActionRow balance_row {
+      activatable: true;
+      action-name: "app.check_balance";
+      title: "Check Balance";
+      icon-name: "accessories-calculator-symbolic";
+    }
+    }
+    Adw.PreferencesGroup{
+    Gtk.Box {
+      spacing: 24;
+      halign: center;
+      hexpand: true;
+      orientation: horizontal;
+    
+      Gtk.ToggleButton send_button{
+        active: true;
+        styles ["pill"]
+        child: Adw.ButtonContent {
+          label: "Send";
+          icon-name: "go-up-symbolic";
+          
+        };
+      }
+      Gtk.ToggleButton {
+        styles ["pill"]
+        group: send_button;
+        child: Adw.ButtonContent {
+          label: "Receive";
+          icon-name: "go-down-symbolic";
+        };
+      }
+    }
+
+    }
+    Adw.PreferencesGroup {
+      Adw.ActionRow {
+        activatable: true;
+        icon-name: "x-office-address-book-symbolic";
+        title: "Contact";
+        }
+      Adw.ActionRow {
+        activatable: true;
+        title: "Phone Number";
+        icon-name: "input-dialpad-symbolic";
+      }
+      Adw.ActionRow {
+        activatable: true;
+        title: "Contact";
+        icon-name: "x-office-address-book-symbolic";
+      }
+      Adw.ActionRow {
+        activatable: true;
+        title: "Saved Beneficiary";
+        icon-name: "view-list-symbolic";
+      }
+      Adw.ActionRow {
+        activatable: true;
+        action-name: 'app.bank';
+        /*action-target: 'app.bank';*/
+        title: "Bank Account";
+        icon-name: "emblem-system-symbolic";
+        visible: bind send_button.active;
+      }
+    }
+  };}
+  
+  Gtk.StackPage stack_page_loading{
+    name: "loading";
+    visible: true;
+    child: Adw.StatusPage {
+      title: "Processing";
+      Gtk.Spinner spinner {
+        valign: center;
+        visible: true;
+        spinning: true;
+      }
+    };
+  }
+  Gtk.StackPage stack_page_done {
+    name: "stack_page_done";
+    child: Adw.StatusPage {
+      icon-name: "emblem-default-symbolic";
+    title: "Success";
+  };
+  }
+
+  }};
             }
 
             Adw.ViewStackPage page2 {

@@ -1,7 +1,7 @@
 from argparse import ArgumentParser
 import dbus
 from time import sleep
-from utils import Service, list_modems
+from utils import Service, list_modems, create_ussd_iface
 
 # Argument parsing ----------------------
 ap = ArgumentParser('upi-ussd', description="Use NPCI's USSD UPI service via Modem")
@@ -18,6 +18,7 @@ ap.add_argument("--list-modems", '-l', action='store_true', help="List all avail
 ap.add_argument("--modem", '-m', metavar='1', help="Modem to use (not required if there is only 1 modem)", nargs=1)
 ap.add_argument("--determine-digits", '-d', action='store_true', help="Determine number of digits in PIN")
 ap.add_argument("--information-profile", '-i', action='store_true', help="Print information of profile")
+ap.add_argument("--log", action='store_true', help="Log responses of USSD to STDERR")
 # ---------------------------------
 
 def main():
@@ -26,6 +27,11 @@ def main():
 
     modems = list_modems(bus)
 
+    if args.log:
+        log = True
+    else:
+        log = False
+    
     # List modems if asked
     if args.list_modems:
         for item in modems:
@@ -41,10 +47,9 @@ def main():
         else:
             modem = args.modem[0]
 
-    modem_obj = bus.get_object("org.freedesktop.ModemManager1", f"/org/freedesktop/ModemManager1/Modem/{modem}")
-    ussd = dbus.Interface(modem_obj, dbus_interface='org.freedesktop.ModemManager1.Modem.Modem3gpp.Ussd')
+    ussd = create_ussd_iface(modem)
 
-    service = Service(ussd)
+    service = Service(ussd, log)
 
     if args.send:
         # Send money

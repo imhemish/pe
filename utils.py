@@ -1,6 +1,7 @@
 from time import sleep
 from xml.etree import ElementTree
 import dbus
+import sys
 
 def list_modems(bus):
     modems = []
@@ -14,9 +15,19 @@ def list_modems(bus):
         modems.append(child.attrib['name'])
     return modems
 
+def create_ussd_iface(modem):
+    modem_obj = dbus.SystemBus().get_object("org.freedesktop.ModemManager1", f"/org/freedesktop/ModemManager1/Modem/{modem}")
+    ussd = dbus.Interface(modem_obj, dbus_interface='org.freedesktop.ModemManager1.Modem.Modem3gpp.Ussd')
+    return ussd
+
 class Service:
-    def __init__(self, ussd_iface):
+    def __init__(self, ussd_iface, log=False):
         self.ussd = ussd_iface
+        self.log = log
+
+    def log_if_needs(self, message):
+        if self.log:
+            sys.stderr.write("UPI USSD log: "+message+"\n")
     
     def clear_requests(self):
     # Cancel any previously running USSD request
@@ -29,10 +40,12 @@ class Service:
         self.clear_requests()
         # If request is not failed, enter pin
         req = str(self.ussd.Initiate(f"*99*1*1*{number}*{amount}*{remark}#"))
-        
+        self.log_if_needs(req)
+
         if "You are paying to" in req:
             sleep(0.01)
             output: str = self.ussd.Respond(pin)
+            self.log_if_needs(output)
 
         # Invalid number
         elif "is not a valid" in req:
@@ -64,10 +77,12 @@ class Service:
 
         # the upi id can not be sent in combined code
         req = str(self.ussd.Initiate("*99*1*3#"))
+        self.log_if_needs(req)
 
         if "Enter UPI" in req:
             sleep(0.01)
             req = str(self.ussd.Respond(id))
+            self.log_if_needs(req)
 
             # Found experimentally
             if "TRANSACTION DECLINED" in req:
@@ -77,13 +92,16 @@ class Service:
                 name = req[7: req.find(",")]
                 sleep(0.01)
                 req = str(self.ussd.Respond(amount))
+                self.log_if_needs(req)
 
                 if "Enter a remark" in req:
                     sleep(0.01)
                     req = self.ussd.Respond(remark)
+                    self.log_if_needs(req)
                     if "You are paying to" in req:
                         sleep(0.01)
                         output = self.ussd.Respond(pin)
+                        self.log_if_needs(output)
                     else:
                         raise Exception("Some error occured")
                 # Invalid amount
@@ -126,6 +144,7 @@ class Service:
         if "UPI ID" in req:
             sleep(0.01)
             req = str(self.ussd.Respond(id))
+            self.log_if_needs(req)
 
             # Found experimentally
             if "TRANSACTION DECLINED" in req:
@@ -135,14 +154,17 @@ class Service:
                 name = req[16: req.find("\n")]
                 sleep(0.01)
                 req = str(self.ussd.Respond(amount))
+                self.log_if_needs(req)
 
                 if "Enter a remark" in req:
                     sleep(0.01)
                     req = self.ussd.Respond(remark)
+                    self.log_if_needs(req)
                     if "You are requesting" in req:
                         sleep(0.01)
                         # Enter 1 to confirm
                         output = self.ussd.Respond("1")
+                        self.log_if_needs(output)
                     else:
                         raise Exception("Some error occured")
                 # Invalid amount
@@ -168,6 +190,7 @@ class Service:
 
         # the upi id can not be sent in combined code
         req = str(self.ussd.Initiate(f"*99*2*{number}*{amount}*{remark}*1#"))
+        self.log_if_needs(req)
         if "Beneficiary payment address incorrect" in req:
             raise Exception("Invalid phone number or is not on UPI")
         elif "is successful" in req:
@@ -181,10 +204,12 @@ class Service:
         self.clear_requests()
 
         req = str(self.ussd.Initiate("*99*3#"))
+        self.log_if_needs(req)
         
         if "Enter" in req:
             sleep(0.01)
             output: str = self.ussd.Respond(pin)
+            self.log_if_needs(output)
             if "Incorrect UPI" in output:
                 raise Exception("Incorrect UPI PIN")
             elif "Your account balance is":
@@ -203,6 +228,7 @@ class Service:
 
         # The service tells the digits in check balance function in form "Enter * digit..."
         req = str(self.ussd.Initiate("*99*3#"))
+        self.log_if_needs(req)
         
         if "Enter" in req:
             shortened_req = req[(req.find("Enter ")+6):]
@@ -220,6 +246,7 @@ class Service:
         self.clear_requests()
 
         req = str(self.ussd.Initiate("*99*5#"))
+        self.log_if_needs(req)
         
         if "You do not have any requests pending" in req:
             return None
@@ -236,6 +263,7 @@ class Service:
         self.clear_requests()
 
         req = str(self.ussd.Initiate("*99*5#"))
+        self.log_if_needs(req)
 
         if "You do not have any requests pending" in req:
             raise Exception("no pending request")
@@ -244,8 +272,10 @@ class Service:
 
             # Respond 2 to reject
             output = self.ussd.Respond("2")
+            self.log_if_needs(output)
             if "Reject this txn" in output:
                 output2 = self.ussd.Respond("1")
+                self.log_if_needs(output2)
             else:
                 raise Exception("Some error occured")
         
@@ -264,6 +294,7 @@ class Service:
         self.clear_requests()
 
         req = self.ussd.Initiate("*99*4*3#")
+        self.log_if_needs(req)
 
         if "Name:" in req:
             output_list = str(req).split("\n")
