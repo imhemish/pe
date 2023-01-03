@@ -2,169 +2,257 @@ using Gtk 4.0;
 using Adw 1;
 
 menu my_menu {
-    section {
-      item {
-        label: "About UPI USSD";
+  section {
+    item {
+      label: "About UPI USSD";
       action: "app.about";
       }
     }
-      
-    }
+}
 
 template ApplicationWindow : Adw.ApplicationWindow {
-    default-height: 450;
-    default-width: 300;
-    Gtk.Box main_cont {
+  default-height: 450;
+  default-width: 300;
+  Gtk.Stack root_stack { 
+    transition-duration: 150;
+    transition-type: rotate_left_right;
+
+
+
+    Gtk.StackPage {
+      name: "main";
+      child: Gtk.Box {
+    vexpand: true;
+    orientation: vertical;
+
+    Adw.HeaderBar main_view_headerbar {
+      centering-policy: strict;
+      title-widget: Adw.ViewSwitcherTitle main_view_switcher_title {
+        title: "UPI USSD";
+        stack: main_view_stack;
+        };
+
+      [end]
+      Gtk.MenuButton {
+        icon-name: 'open-menu-symbolic';
+        menu-model: my_menu;
+      }
+
+    }
+
+      Adw.ViewStack main_view_stack {
         vexpand: true;
-        orientation: vertical;
 
-        Adw.HeaderBar header_bar {
-            Gtk.Button back_button {
-                icon-name: "go-previous-symbolic";
-                action-name: "app.settings_stack";
-                action-target: "app.settings_stack";
-            }
-            centering-policy: strict;
+        Adw.ViewStackPage main_view_home {
+          name: "home";
+          title: "Home";
+          icon-name: 'user-home-symbolic';
+          child: Adw.ToastOverlay main_view_page_home_overlay {
 
-            title-widget: Adw.ViewSwitcherTitle view_switcher_title {
-                title: "UPI USSD";
-                stack: view_stack;
-            };
-        [end]
-        Gtk.MenuButton settings_button {
-                icon-name: 'open-menu-symbolic';
-                menu-model: my_menu;
-            }
+            Adw.PreferencesPage {
+        
+                Adw.PreferencesGroup {
+                  Adw.ActionRow main_view_home_balance_row {
+                    activatable: true;
+                    action-name: "win.check_balance";
+                    title: "Check Balance";
+                    icon-name: "accessories-calculator-symbolic";
+                  }
+                }
 
+                Adw.PreferencesGroup{
+                  Gtk.Box {
+                    spacing: 24;
+                    halign: center;
+                    hexpand: true;
+                    orientation: horizontal;
+        
+                    Gtk.ToggleButton main_view_home_send{
+                      active: true;
+                      styles ["pill"]
+                      child: Adw.ButtonContent {
+                        label: "Send";
+                        icon-name: "go-up-symbolic";
+                      };
+                    }
+                    
+                    Gtk.ToggleButton main_view_home_receive {
+                      styles ["pill"]
+                      group: main_view_home_send;
+                      child: Adw.ButtonContent {
+                        label: "Receive";
+                        icon-name: "go-down-symbolic";
+                      };
+                    }
+                  }
+
+                }
+
+                Adw.PreferencesGroup {
+                  Adw.ActionRow {
+                    activatable: true;
+                    icon-name: "x-office-address-book-symbolic";
+                    title: "Contact";
+                    }
+                  Adw.ActionRow {
+                    activatable: true;
+                    title: "Phone Number";
+                    icon-name: "input-dialpad-symbolic";
+                  }
+                  Adw.ActionRow {
+                    activatable: true;
+                    title: "Contact";
+                    icon-name: "x-office-address-book-symbolic";
+                  }
+                  Adw.ActionRow {
+                    activatable: true;
+                    title: "Saved Beneficiary";
+                    icon-name: "view-list-symbolic";
+                  }
+                  Adw.ActionRow {
+                    activatable: true;
+                    title: "Bank Account";
+                    icon-name: "emblem-system-symbolic";
+                    /* Because receive from bank account is not possible */
+                    visible: bind main_view_home_send.active;
+                  }
+                }
+              }
+              };
         }
-
-            
-        Adw.ViewStack view_stack {
-            vexpand: true;
-
-            Adw.ViewStackPage page1 {
-                name: "home";
-                title: "Home";
-                icon-name: 'user-home-symbolic';
-                child: Adw.ToastOverlay {Gtk.Stack home_stack {
-                  transition-type: crossfade;
-                  transition-duration: 150;
-    Gtk.StackPage home_stack_settings{
-      name: "settings";
-  child: Adw.PreferencesPage {
-    
-    Adw.PreferencesGroup {
-    Adw.ActionRow balance_row {
-      activatable: true;
-      action-name: "app.check_balance";
-      title: "Check Balance";
-      icon-name: "accessories-calculator-symbolic";
-    }
-    }
-    Adw.PreferencesGroup{
-    Gtk.Box {
-      spacing: 24;
-      halign: center;
-      hexpand: true;
-      orientation: horizontal;
-    
-      Gtk.ToggleButton send_button{
-        active: true;
-        styles ["pill"]
-        child: Adw.ButtonContent {
-          label: "Send";
-          icon-name: "go-up-symbolic";
-          
-        };
-      }
-      Gtk.ToggleButton {
-        styles ["pill"]
-        group: send_button;
-        child: Adw.ButtonContent {
-          label: "Receive";
-          icon-name: "go-down-symbolic";
-        };
-      }
-    }
-
-    }
-    Adw.PreferencesGroup {
-      Adw.ActionRow {
-        activatable: true;
-        icon-name: "x-office-address-book-symbolic";
-        title: "Contact";
+        Adw.ViewStackPage main_view_transactions {
+          name: "transactions";
+          title: "Transactions";
+          icon-name: "mail-send-receive-symbolic";
+          child: Adw.ToastOverlay {};
         }
-      Adw.ActionRow {
-        activatable: true;
-        title: "Phone Number";
-        icon-name: "input-dialpad-symbolic";
+                
+        Adw.ViewStackPage main_view_profile {
+          name: "profile";
+          title: "Profile";
+          icon-name: 'system-users-symbolic';
+          child: Gtk.Label {
+          label: "Page 3";
+          };
+        }
+                
       }
-      Adw.ActionRow {
-        activatable: true;
-        title: "Contact";
-        icon-name: "x-office-address-book-symbolic";
-      }
-      Adw.ActionRow {
-        activatable: true;
-        title: "Saved Beneficiary";
-        icon-name: "view-list-symbolic";
-      }
-      Adw.ActionRow {
-        activatable: true;
-        action-name: 'app.bank';
-        /*action-target: 'app.bank';*/
-        title: "Bank Account";
-        icon-name: "emblem-system-symbolic";
-        visible: bind send_button.active;
-      }
+  
+    Adw.ViewSwitcherBar main_view_switcher {
+      valign: end;
+      stack: main_view_stack;
+      reveal: bind main_view_switcher_title.title-visible;
     }
   };}
-  
-  Gtk.StackPage stack_page_loading{
-    name: "loading";
-    visible: true;
-    child: Adw.StatusPage {
-      title: "Processing";
-      Gtk.Spinner spinner {
-        valign: center;
-        visible: true;
-        spinning: true;
+
+
+            Gtk.StackPage transaction_view {
+              name: "transaction";
+              child: Gtk.Box {
+                orientation: vertical;
+                vexpand: true;
+
+
+
+              Adw.HeaderBar {
+      centering-policy: strict;
+      name: "UPI";
+      Gtk.Button transaction_view_back_button{
+        icon-name: "go-left-symbolic";
       }
-    };
-  }
-  Gtk.StackPage stack_page_done {
-    name: "stack_page_done";
-    child: Adw.StatusPage {
-      icon-name: "emblem-default-symbolic";
-    title: "Success";
-  };
-  }
+      [end]
+      Gtk.MenuButton {
+        icon-name: 'open-menu-symbolic';
+        menu-model: my_menu;
+      }
 
-  }};
+    }
+
+              Adw.PreferencesPage {
+                Adw.PreferencesGroup {
+                  Gtk.Box transaction_view_address_box {}
+                  Adw.EntryRow transaction_view_amount {
+                    title: "Amount";
+                    input-purpose: number;
+                  }
+                  Adw.EntryRow {
+                    title: "Remark";
+                    input-purpose: free_form;
+                  }
+                }
+        
+                  Adw.PreferencesGroup {Gtk.Box {
+                    spacing: 24;
+                    halign: center;
+                    hexpand: true;
+                    orientation: horizontal;   
+                    Gtk.Button transaction_view_cancel{
+                      styles ["pill", "destructive-action"]
+                      label: "Cancel";
+                    
+                    }
+                    
+                    Gtk.Button transaction_view_send{
+                      styles ["pill", "suggested-action"]
+                      label: "Send";
+                    }
+                  }}
+              
+              }};
+
+                }
+
+
+
+
+
+            Gtk.StackPage processing_view {
+              name: "processing";
+              visible: true;
+              child: Adw.StatusPage {
+                title: "Processing";
+                Gtk.Spinner processing_view_spinner {
+                  valign: center;
+                  visible: true;
+                  spinning: true;
+                }
+              };
             }
 
-            Adw.ViewStackPage page2 {
-                name: "bla2";
-                title: "bla2";
-                child: Gtk.Label {
-                    label: "Page 2";
-                };
+
+
+
+            Gtk.StackPage success_view {
+              name: "success";
+              child: Gtk.Box {
+                orientation: vertical;
+                vexpand: true;
+
+              Adw.HeaderBar {
+      centering-policy: strict;
+      name: "UPI";
+      Gtk.Button success_view_back_button{
+        icon-name: "go-left-symbolic";
+      }
+      [end]
+      Gtk.MenuButton {
+        icon-name: 'open-menu-symbolic';
+        menu-model: my_menu;
+      }
+
+    }
+
+              
+              Gtk.Box{
+                vexpand: true;
+                hexpand: true;
+                halign: center;
+                Adw.StatusPage success_view_status{
+              icon-name: "emblem-default-symbolic";
+              title: "Success";
+            }}};
             }
-            
-            Adw.ViewStackPage page3 {
-                name: "profile";
-                title: "Profile";
-                icon-name: 'system-users-symbolic';
-                child: Gtk.Label {
-                    label: "Page 3";
-                };
-            }
-            
-            }
-            Adw.ViewSwitcherBar view_switcher {
-                valign: end;
-                stack: view_stack;
-                reveal: bind view_switcher_title.title-visible;
-            }
-        }
-}
+
+
+  }
+} 

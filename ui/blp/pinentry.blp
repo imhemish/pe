@@ -7,4 +7,6 @@ template PinEntry : Adw.MessageDialog {
     extra-child: Gtk.PasswordEntry gtk_entry {
         show-peek-icon: true;
     };
+    close-response: 'cancel';
+    default-response: 'ok';
 }

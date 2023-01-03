@@ -214,6 +214,11 @@ class Service:
                 raise Exception("Incorrect UPI PIN")
             elif "Your account balance is":
                 pass
+
+            # Happens in my account at night (my internet upi apps also fail to check balance)
+            elif "Error fetching balance":
+                raise Exception("error fetching balance")
+            
             else:
                 raise Exception("Some error occured")
 
