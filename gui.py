@@ -3,7 +3,6 @@ import gi
 import dbus
 import threading
 import dbus
-import time
 
 gi.require_version('Gtk', '4.0')
 gi.require_version('Adw', '1')
@@ -12,7 +11,7 @@ from gi.repository import Gtk, Gio, Adw
 
 from utils import Service, list_modems, create_ussd_iface
 
-APP_ID = 'io.github.heymisphere.upi_ussd'
+APP_ID = 'io.github.heymisphere.pe'
 
 @Gtk.Template(filename='ui/ui/pinentry.ui')
 class PinEntry(Adw.MessageDialog):
@@ -30,8 +29,14 @@ class PinEntry(Adw.MessageDialog):
 class ApplicationWindow(Adw.ApplicationWindow):
     __gtype_name__ = "ApplicationWindow"
     root_stack: Gtk.Stack = Gtk.Template.Child()
-    main_view_home_send: Gtk.ToggleButton = Gtk.Template.Child()
-    main_view_home_receive: Gtk.ToggleButton = Gtk.Template.Child()
+
+    # Append main view to main gui
+    main_view_builder = Gtk.Builder.new_from_file("ui/ui/main_view.ui")
+    main_view = main_view_builder.get_object("main_view")
+    main_view_home_send: Gtk.ToggleButton = main_view_builder.get_object("main_view_home_send")
+    main_view_home_balance_row = main_view_builder.get_object("main_view_home_balance_row")
+    #root_stack.add_named(main_view, 'main')
+
     transaction_view: Gtk.StackPage = Gtk.Template.Child()
     transaction_view_back_button = Gtk.Template.Child()
     transaction_view_cancel: Gtk.Button = Gtk.Template.Child()
@@ -39,12 +44,11 @@ class ApplicationWindow(Adw.ApplicationWindow):
     transaction_view_amount = Gtk.Template.Child()
     transaction_view_address_box: Gtk.Box = Gtk.Template.Child()
     success_view_back_button = Gtk.Template.Child()
-    main_view_home_balance_row = Gtk.Template.Child()
 
     def __init__(self, **kwargs):
-        Adw.ApplicationWindow.__init__(self, **kwargs)
+        super().__init__(**kwargs)
         self.create_action("check_balance", self._check_balance)
-        self.root_stack.set_visible_child_name('transaction')
+        self.root_stack.set_visible_child_name('main')
         self.transaction_view_cancel.connect('clicked', self.go_back_to_main_view)
         self.transaction_view_back_button.connect('clicked', self.go_back_to_main_view)
         self.success_view_back_button.connect('clicked', self.go_back_to_main_view)
@@ -104,7 +108,7 @@ class Application(Adw.Application):
     def __init__(self):
         super().__init__(application_id=APP_ID, flags=Gio.ApplicationFlags.FLAGS_NONE)
         self.create_action("about", self.about)
-        self.upi_service = Service(create_ussd_iface(list_modems(dbus.SystemBus())[0]), True)
+        #self.upi_service = Service(create_ussd_iface(list_modems(dbus.SystemBus())[0]), True)
     
     def about(self, *args):
         builder = Gtk.Builder().new_from_file("ui/ui/about.ui")
