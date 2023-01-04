@@ -4,6 +4,9 @@ import dbus
 import threading
 import dbus
 
+from os import system
+system('./compile_blp')
+
 gi.require_version('Gtk', '4.0')
 gi.require_version('Adw', '1')
 
@@ -47,11 +50,18 @@ class ApplicationWindow(Adw.ApplicationWindow):
         main_view_builder = Gtk.Builder.new_from_file("ui/ui/main_view.ui")
         main_view_box = main_view_builder.get_object("main_view_box")
         self.main_view_home_send: Gtk.ToggleButton = main_view_builder.get_object("main_view_home_send")
+        self.main_view_home_receive: Gtk.ToggleButton = main_view_builder.get_object("main_view_home_receive")
         self.main_view_home_balance_row = main_view_builder.get_object("main_view_home_balance_row")
+        self.main_view_home_options_list = main_view_builder.get_object("main_view_home_options_list")
+
+        # Because you can't make an collect request from bank account and ifsc
+        self.main_view_home_options_list.connect('row-selected', lambda *args: self.main_view_home_receive.set_visible(False) if (args[1].get_name()=='bank') else self.main_view_home_receive.set_visible(True))
 
         # self.main_view is a Gtk.StackPage returned by add_named method
         self.main_view = self.root_stack.add_named(main_view_box, 'main')
         self.root_stack.set_visible_child_name('main')
+
+        # Go back to main view from back_button(s) in headerbars of respective views
         self.transaction_view_cancel.connect('clicked', self.go_back_to_main_view)
         self.transaction_view_back_button.connect('clicked', self.go_back_to_main_view)
         self.success_view_back_button.connect('clicked', self.go_back_to_main_view)

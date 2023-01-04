@@ -18,7 +18,7 @@ Gtk.Box main_view_box{
   Adw.HeaderBar main_view_headerbar {
       centering-policy: strict;
       title-widget: Adw.ViewSwitcherTitle main_view_switcher_title {
-        title: "UPI USSD";
+        title: "Pe";
         stack: main_view_stack;
       };
       
@@ -32,6 +32,9 @@ Gtk.Box main_view_box{
 
 
   Adw.ViewStack main_view_stack {
+    margin-start: 5;
+    margin-end: 5;
+
     vexpand: true;
 
     Adw.ViewStackPage main_view_home {
@@ -50,25 +53,60 @@ Gtk.Box main_view_box{
             }
           }
 
+
+          Adw.PreferencesGroup {
+            Gtk.ListBox main_view_home_options_list{
+              styles ["boxed-list"]
+              Adw.ActionRow {
+                name: "id";
+                icon-name: "mail-send-symbolic";
+                title: "UPI ID";
+                }
+              Adw.ActionRow {
+                name: "number";
+                title: "Phone Number";
+                icon-name: "input-dialpad-symbolic";
+              }
+              Adw.ActionRow {
+                name: "contact";
+                title: "Contact";
+                icon-name: "x-office-address-book-symbolic";
+              }
+              Adw.ActionRow {
+                name: "beneficiary";
+                title: "Saved Beneficiary";
+                icon-name: "view-list-symbolic";
+              }
+              Adw.ActionRow main_view_home_bank_account_row{
+                name: "bank";
+                title: "Bank Account";
+                icon-name: "bank-symbolic";
+              }
+            }
+          }
+
+
           Adw.PreferencesGroup {
             Gtk.Box {
-              spacing: 24;
-              halign: center;
-              hexpand: true;
+              spacing: 10;
               orientation: horizontal;
+              hexpand: true;
+              halign: center;
 
-              Gtk.ToggleButton main_view_home_send{
-                active: true;
-                styles ["pill"]
+              Gtk.Button main_view_home_send{
+                halign: start;
+                name: "send";
+                styles ["pill", "suggested-action"]
                 child: Adw.ButtonContent {
                   label: "Send";
                   icon-name: "go-up-symbolic";
                 };
               }
 
-              Gtk.ToggleButton main_view_home_receive {
-                styles ["pill"]
-                group: main_view_home_send;
+              Gtk.Button main_view_home_receive {
+                halign: end;
+                name: "receive";
+                styles ["pill", "suggested-action"]
                 child: Adw.ButtonContent {
                   label: "Receive";
                   icon-name: "go-down-symbolic";
@@ -77,35 +115,8 @@ Gtk.Box main_view_box{
             }
           }
 
-          Adw.PreferencesGroup {
-            Adw.ActionRow {
-              activatable: true;
-              icon-name: "x-office-address-book-symbolic";
-              title: "Contact";
-              }
-            Adw.ActionRow {
-              activatable: true;
-              title: "Phone Number";
-              icon-name: "input-dialpad-symbolic";
-            }
-            Adw.ActionRow {
-              activatable: true;
-              title: "Contact";
-              icon-name: "x-office-address-book-symbolic";
-            }
-            Adw.ActionRow {
-              activatable: true;
-              title: "Saved Beneficiary";
-              icon-name: "view-list-symbolic";
-            }
-            Adw.ActionRow {
-              activatable: true;
-              title: "Bank Account";
-              icon-name: "emblem-system-symbolic";
-              /* Because receive from bank account is not possible */
-              visible: bind main_view_home_send.active;
-            }
-          }
+
+
         }
       };
     }
