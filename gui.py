@@ -30,13 +30,6 @@ class ApplicationWindow(Adw.ApplicationWindow):
     __gtype_name__ = "ApplicationWindow"
     root_stack: Gtk.Stack = Gtk.Template.Child()
 
-    # Append main view to main gui
-    main_view_builder = Gtk.Builder.new_from_file("ui/ui/main_view.ui")
-    main_view = main_view_builder.get_object("main_view")
-    main_view_home_send: Gtk.ToggleButton = main_view_builder.get_object("main_view_home_send")
-    main_view_home_balance_row = main_view_builder.get_object("main_view_home_balance_row")
-    #root_stack.add_named(main_view, 'main')
-
     transaction_view: Gtk.StackPage = Gtk.Template.Child()
     transaction_view_back_button = Gtk.Template.Child()
     transaction_view_cancel: Gtk.Button = Gtk.Template.Child()
@@ -48,6 +41,15 @@ class ApplicationWindow(Adw.ApplicationWindow):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.create_action("check_balance", self._check_balance)
+
+
+        # Append main view to main gui
+        self.main_view_builder = Gtk.Builder.new_from_file("ui/ui/main_view.ui")
+        self.main_view = self.main_view_builder.get_object("main_view")
+        self.main_view_home_send: Gtk.ToggleButton = self.main_view_builder.get_object("main_view_home_send")
+        self.main_view_home_balance_row = self.main_view_builder.get_object("main_view_home_balance_row")
+
+        self.root_stack.add_named(self.main_view, 'main')
         self.root_stack.set_visible_child_name('main')
         self.transaction_view_cancel.connect('clicked', self.go_back_to_main_view)
         self.transaction_view_back_button.connect('clicked', self.go_back_to_main_view)
