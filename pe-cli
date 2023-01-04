@@ -1,10 +1,11 @@
+#!/usr/bin/env python3
 from argparse import ArgumentParser
 import dbus
 from time import sleep
 from utils import Service, list_modems, create_ussd_iface
 
 # Argument parsing ----------------------
-ap = ArgumentParser('upi-ussd', description="Use NPCI's USSD UPI service via Modem")
+ap = ArgumentParser('pe-cli', description="Use NPCI's USSD UPI service via Modem")
 ap.add_argument("--send", '-s', action='store_true', required=False, help="Send Money")
 ap.add_argument("--receive", '-r', action='store_true', required=False, help="Receive Money")
 ap.add_argument("--address", '-a', metavar='upi/number', required=False, nargs=1, help="UPI ID or number to send/receive from")
