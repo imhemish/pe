@@ -44,12 +44,13 @@ class ApplicationWindow(Adw.ApplicationWindow):
 
 
         # Append main view to main gui
-        self.main_view_builder = Gtk.Builder.new_from_file("ui/ui/main_view.ui")
-        self.main_view = self.main_view_builder.get_object("main_view")
-        self.main_view_home_send: Gtk.ToggleButton = self.main_view_builder.get_object("main_view_home_send")
-        self.main_view_home_balance_row = self.main_view_builder.get_object("main_view_home_balance_row")
+        main_view_builder = Gtk.Builder.new_from_file("ui/ui/main_view.ui")
+        main_view_box = main_view_builder.get_object("main_view_box")
+        self.main_view_home_send: Gtk.ToggleButton = main_view_builder.get_object("main_view_home_send")
+        self.main_view_home_balance_row = main_view_builder.get_object("main_view_home_balance_row")
 
-        self.root_stack.add_named(self.main_view, 'main')
+        # self.main_view is a Gtk.StackPage returned by add_named method
+        self.main_view = self.root_stack.add_named(main_view_box, 'main')
         self.root_stack.set_visible_child_name('main')
         self.transaction_view_cancel.connect('clicked', self.go_back_to_main_view)
         self.transaction_view_back_button.connect('clicked', self.go_back_to_main_view)
