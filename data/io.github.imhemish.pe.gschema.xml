@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist gettext-domain="pe">
+	<schema id="io.github.imhemish.pe" path="/io/github/imhemish/pe/">
+	</schema>
+</schemalist>

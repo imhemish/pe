@@ -56,8 +56,10 @@ Gtk.Box main_view_box{
 
           Adw.PreferencesGroup {
             Gtk.ListBox main_view_home_options_list{
+              selection-mode: browse;
+
               styles ["boxed-list"]
-              Adw.ActionRow {
+              Adw.ActionRow main_view_home_option_id{
                 name: "id";
                 icon-name: "mail-send-symbolic";
                 title: "UPI ID";
@@ -65,6 +67,7 @@ Gtk.Box main_view_box{
               Adw.ActionRow {
                 name: "number";
                 title: "Phone Number";
+                
                 icon-name: "input-dialpad-symbolic";
               }
               Adw.ActionRow {

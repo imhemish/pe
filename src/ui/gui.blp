@@ -14,7 +14,7 @@ template ApplicationWindow : Adw.ApplicationWindow {
   title: "Pe";
   Gtk.Stack root_stack {
     transition-duration: 150;
-    transition-type: rotate_left_right;
+    transition-type: crossfade;
 
 
 
@@ -28,10 +28,10 @@ template ApplicationWindow : Adw.ApplicationWindow {
 
               Adw.HeaderBar {
       centering-policy: strict;
-      name: "UPI";
+      name: "Pe";
       Gtk.Button transaction_view_back_button{
         tooltip-text: "Go Back";
-        icon-name: "go-left-symbolic";
+        icon-name: "go-previous-symbolic";
       }
       [end]
       Gtk.MenuButton {
@@ -43,8 +43,7 @@ template ApplicationWindow : Adw.ApplicationWindow {
     }
 
               Adw.PreferencesPage {
-                Adw.PreferencesGroup {
-                  Gtk.Box transaction_view_address_box {}
+                Adw.PreferencesGroup transaction_view_input_group {
                   Adw.EntryRow transaction_view_amount {
                     title: "Amount";
                     input-purpose: number;
@@ -68,9 +67,12 @@ template ApplicationWindow : Adw.ApplicationWindow {
                     
                     }
                     
-                    Gtk.Button transaction_view_send{
+                    Gtk.Button transaction_view_send_receive{ 
+                      name: 'send/receive';
                       styles ["pill", "suggested-action"]
-                      label: "Send";
+
+                      /* Would be dynamically changed to 'Send' or 'Receive' in code */
+                      label: "Send/Receive";
                     }
                   }}
               
@@ -78,8 +80,43 @@ template ApplicationWindow : Adw.ApplicationWindow {
 
                 }
 
+            Gtk.StackPage pinentry_view {
+              name: "pinentry";
+              child: Gtk.Box {
+                orientation: vertical;
+                hexpand: true;
+                vexpand: true;
+                Adw.HeaderBar {
+      centering-policy: strict;
+      name: "Pe";
+      Gtk.Button pinentry_view_back_button{
+        tooltip-text: "Go Back";
+        icon-name: "go-previous-symbolic";
+      }
+      [end]
+      Gtk.MenuButton {
+        tooltip-text: "Menu";
+        icon-name: 'open-menu-symbolic';
+        menu-model: my_menu;
+      }
 
+    }
+              Adw.StatusPage{
+                valign: center;
+                vexpand: true;
+                title: "Enter PIN";
+                child: 
+                        Adw.PasswordEntryRow {
+                          title: 'PIN';
+			  styles ["view"]
+                        show-apply-button: true;
+                        halign: center;
+                        hexpand: true;
+                        };
 
+              }
+            };
+            }
 
 
             Gtk.StackPage processing_view {
@@ -108,7 +145,7 @@ template ApplicationWindow : Adw.ApplicationWindow {
       centering-policy: strict;
       name: "UPI";
       Gtk.Button success_view_back_button{
-        icon-name: "go-left-symbolic";
+        icon-name: "go-previous-symbolic";
       }
       [end]
       Gtk.MenuButton {

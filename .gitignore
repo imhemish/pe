@@ -1,2 +1,5 @@
+/subprojects/blueprint-compiler
+/.flatpak
+/_build
+.vscode
 __pycache__
-ui/ui/

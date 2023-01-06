@@ -1,5 +1,0 @@
-#!/bin/sh
-blueprint-compiler compile ui/blp/gui.blp > ui/ui/gui.ui
-blueprint-compiler compile ui/blp/about.blp > ui/ui/about.ui
-blueprint-compiler compile ui/blp/pinentry.blp > ui/ui/pinentry.ui
-blueprint-compiler compile ui/blp/main_view.blp > ui/ui/main_view.ui
