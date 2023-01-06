@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <gresources>
-  <gresource prefix="/io/github/imhemish/tapes">
+  <gresource prefix="/io/github/imhemish/pe">
     <file>ui/main_view.ui</file>
     <file>ui/about.ui</file>
-    <file>ui/gui.blp</file>
+    <file>ui/gui.ui</file>
   </gresource>
 </gresources>

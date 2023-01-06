@@ -1,6 +1,6 @@
-data/io.github.imhemish.tapes.desktop.in
-data/io.github.imhemish.tapes.appdata.xml.in
-data/io.github.imhemish.tapes.gschema.xml
+data/io.github.imhemish.pe.desktop.in
+data/io.github.imhemish.pe.appdata.xml.in
+data/io.github.imhemish.pe.gschema.xml
 src/main.py
 src/ui/about.blp
 src/ui/gui.blp

@@ -1,1 +1,1 @@
-i18n.gettext('tapes', preset: 'glib')
+i18n.gettext('pe', preset: 'glib')

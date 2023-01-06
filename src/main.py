@@ -31,7 +31,7 @@ class ApplicationWindow(Adw.ApplicationWindow):
 
 
         # Append main view to main gui
-        main_view_builder = Gtk.Builder.new_from_file("ui/ui/main_view.ui")
+        main_view_builder = Gtk.Builder.new_from_resource("/io/github/imhemish/pe/ui/main_view.ui")
         main_view_box = main_view_builder.get_object("main_view_box")
         self.main_view_home_send: Gtk.ToggleButton = main_view_builder.get_object("main_view_home_send")
         self.main_view_home_receive: Gtk.ToggleButton = main_view_builder.get_object("main_view_home_receive")
