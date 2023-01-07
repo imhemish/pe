@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 from argparse import ArgumentParser
-import dbus
+from dasbus.connection import SystemMessageBus
 from time import sleep
 from utils import Service, list_modems, create_ussd_iface
 
@@ -23,7 +23,7 @@ ap.add_argument("--log", action='store_true', help="Log responses of USSD to STD
 # ---------------------------------
 
 def main():
-    bus = dbus.SystemBus()
+    bus = SystemMessageBus()
     args = ap.parse_args()
 
     modems = list_modems(bus)

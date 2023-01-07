@@ -1,5 +1,5 @@
 {
-    "app-id" : "io.github.imhemish.pe",
+    "id" : "io.github.imhemish.pe",
     "runtime" : "org.gnome.Platform",
     "runtime-version" : "43",
     "sdk" : "org.gnome.Sdk",
@@ -10,6 +10,7 @@
         "--socket=fallback-x11",
         "--device=dri",
         "--socket=wayland",
+        "--socket=system-bus",
         "--system-talk-name=org.freedesktop.ModemManager1"
     ],
     "cleanup" : [
@@ -36,27 +37,16 @@
              ]
         },
 
+        "python3-dasbus.json",
+
         {
             "name" : "pe",
             "builddir" : true,
             "buildsystem" : "meson",
             "sources" : [
                 {
-                    "type" : "git",
-                    "url" : "file:///home/cat/github/pe/",
-		    "branch": "main"
-                }
-            ]
-        },
-        
-        {
-            "name": "python3-dbus-python",
-            "buildsystem": "meson",
-            "sources": [
-                {
-                    "type": "git",
-                    "url": "https://github.com/freedesktop/dbus-python",
-                    "branch": "master"
+                    "type" : "dir",
+                    "path" : "./"
                 }
             ]
         }

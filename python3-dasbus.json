@@ -1,0 +1,15 @@
+{
+    "name": "python3-dasbus",
+    "buildsystem": "simple",
+    "finish-args": ["--socket=system-bus"],
+    "build-commands": [
+        "pip3 install --verbose --exists-action=i --no-index --find-links=\"file://${PWD}\" --prefix=${FLATPAK_DEST} \"dasbus\" --no-build-isolation"
+    ],
+    "sources": [
+        {
+            "type": "file",
+            "url": "https://files.pythonhosted.org/packages/e1/b4/4d55b9359bc34d56b29b943b378331dd8aaea6db6d0543e5d97fed4b1af7/dasbus-1.7-py3-none-any.whl",
+            "sha256": "0a9433e9e72c2c865fa2d5ef824ac4ef49b540cf57f6396e515c2f314e5c14cd"
+        }
+    ]
+}

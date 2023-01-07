@@ -6,13 +6,15 @@ blueprints = custom_target('blueprints',
   input: files(
     'ui/main_view.blp',
     'ui/gui.blp',
-    'ui/about.blp'
+    'ui/about.blp',
+    'ui/pin_entry.blp',
+    'ui/success_view.blp',
+    'ui/transaction_view.blp',
+    'ui/menu_button.blp'
   ),
   output: '.',
   command: [find_program('blueprint-compiler'), 'batch-compile', '@OUTPUT@', '@CURRENT_SOURCE_DIR@', '@INPUT@'],
 )
-
-
 
 gnome.compile_resources('pe',
   'pe.gresource.xml',
@@ -41,7 +43,12 @@ configure_file(
 pe_sources = [
   '__init__.py',
   'main.py',
+  'window.py',
   'utils.py',
+  'pin_entry.py',
+  'success_view.py',
+  'transaction_view.py',
+  'menu_button.py'
 ]
 
 install_data(pe_sources, install_dir: moduledir)

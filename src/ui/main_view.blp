@@ -1,16 +1,6 @@
 using Gtk 4.0;
 using Adw 1;
 
-
-menu my_menu {
-  section {
-    item {
-      label: "About Pe";
-      action: "app.about";
-      }
-    }
-}
-
 Gtk.Box main_view_box{
   vexpand: true;
   orientation: vertical;
@@ -23,10 +13,7 @@ Gtk.Box main_view_box{
       };
       
       [end]
-      Gtk.MenuButton {
-        icon-name: 'open-menu-symbolic';
-        menu-model: my_menu;
-      }
+      .MenuButton {}
 
   }
 
@@ -47,7 +34,6 @@ Gtk.Box main_view_box{
           Adw.PreferencesGroup {
             Adw.ActionRow main_view_home_balance_row {
               activatable: true;
-              action-name: "win.check_balance";
               title: "Check Balance";
               icon-name: "accessories-calculator-symbolic";
             }

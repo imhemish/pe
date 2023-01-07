@@ -1,0 +1,34 @@
+using Gtk 4.0;
+using Adw 1;
+
+template PinEntry : Gtk.Box {
+    orientation: vertical;
+    hexpand: true;
+    vexpand: true;
+
+    Adw.HeaderBar {
+      centering-policy: strict;
+      name: "Pe";
+      Gtk.Button pinentry_view_back_button{
+        tooltip-text: "Go Back";
+        icon-name: "go-previous-symbolic";
+      }
+      [end]
+      .MenuButton {}
+
+    }
+
+    Adw.StatusPage{
+      valign: center;
+      vexpand: true;
+      title: "Enter PIN";
+      child: Adw.PasswordEntryRow pinentry_view_entry_row {
+        title: 'PIN';
+	    styles ["view"]
+        show-apply-button: true;
+        halign: center;
+        hexpand: true;     
+        };
+    }
+    
+}

@@ -1,24 +1,21 @@
 from time import sleep
 from xml.etree import ElementTree
-import dbus
+from dasbus.connection import SystemMessageBus
 import sys
 
 def list_modems(bus):
     modems = []
-    obj = bus.get_object("org.freedesktop.ModemManager1", "/org/freedesktop/ModemManager1/Modem")
+    obj = bus.get_proxy("org.freedesktop.ModemManager1", "/org/freedesktop/ModemManager1/Modem")
 
     # Introspect Dbus to find all modems under /org/freedestop/ModemManager1/Modem/
     # Modified from an answer from https://unix.stackexchange.com/questions/203410/how-to-list-all-object-paths-under-a-dbus-service
-    iface = dbus.Interface(obj, dbus_interface='org.freedesktop.DBus.Introspectable')
-    xml_string = iface.Introspect()
+    xml_string = obj.Introspect()
     for child in ElementTree.fromstring(xml_string):
         modems.append(child.attrib['name'])
     return modems
 
 def create_ussd_iface(modem):
-    modem_obj = dbus.SystemBus().get_object("org.freedesktop.ModemManager1", f"/org/freedesktop/ModemManager1/Modem/{modem}")
-    ussd = dbus.Interface(modem_obj, dbus_interface='org.freedesktop.ModemManager1.Modem.Modem3gpp.Ussd')
-    return ussd
+    return SystemMessageBus().get_proxy("org.freedesktop.ModemManager1", f"/org/freedesktop/ModemManager1/Modem/{modem}")
 
 class Service:
     def __init__(self, ussd_iface, log=False):
