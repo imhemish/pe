@@ -9,15 +9,15 @@ template ApplicationWindow : Adw.ApplicationWindow {
     
             Gtk.StackPage processing_view {
               name: "processing";
-              visible: true;
-              child: Adw.StatusPage {
+              child: Gtk.WindowHandle{
+              Adw.StatusPage {
                 title: "Processing";
                 Gtk.Spinner processing_view_spinner {
                   valign: center;
                   visible: true;
                   spinning: true;
                 }
-              };
+              }};
             }
   }
 } 

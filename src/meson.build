@@ -48,7 +48,8 @@ pe_sources = [
   'pin_entry.py',
   'success_view.py',
   'transaction_view.py',
-  'menu_button.py'
+  'menu_button.py',
+  'address_widgets.py'
 ]
 
 install_data(pe_sources, install_dir: moduledir)

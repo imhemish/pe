@@ -16,7 +16,7 @@ class Application(Adw.Application):
     def __init__(self):
         super().__init__(application_id=APP_ID, flags=Gio.ApplicationFlags.FLAGS_NONE)
         self.create_action("about", self.about)
-        #self.upi_service = Service(create_ussd_iface(list_modems(SystemMessageBus())[0]), True)
+        self.upi_service = Service(create_ussd_iface(list_modems(SystemMessageBus())[0]), True)
     
     def about(self, *args):
         about_window = Gtk.Builder().new_from_resource('/io/github/imhemish/pe/ui/about.ui').get_object("about_window")

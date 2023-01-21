@@ -2,7 +2,7 @@ using Gtk 4.0;
 using Adw 1;
 
 template SuccessView : Gtk.Box {
-    child: Gtk.Box {
+    Gtk.Box {
         orientation: vertical;
         vexpand: true;
 
@@ -10,9 +10,8 @@ template SuccessView : Gtk.Box {
             centering-policy: strict;
             name: "UPI";
 
-            Gtk.Button {
+            Gtk.Button success_view_back_button {
               icon-name: "go-previous-symbolic";
-              action-name: "win.go_back_to_main_view";
             }
 
             [end]
@@ -30,6 +29,6 @@ template SuccessView : Gtk.Box {
                 title: "Success";
             }
         }
-    };
+    }
 
 }

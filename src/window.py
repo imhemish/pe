@@ -6,14 +6,15 @@ from .pin_entry import PinEntry
 from .menu_button import MenuButton
 from .success_view import SuccessView
 from .transaction_view import TransactionView
+from .address_widgets import NormalWidget
 
 @Gtk.Template(resource_path='/io/github/imhemish/pe/ui/gui.ui')
 class ApplicationWindow(Adw.ApplicationWindow):
     __gtype_name__ = "ApplicationWindow"
     root_stack: Gtk.Stack = Gtk.Template.Child()
 
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
         # Append main view to main gui ---------------------------------
         main_view_builder = Gtk.Builder.new_from_resource("/io/github/imhemish/pe/ui/main_view.ui")
@@ -58,24 +59,59 @@ class ApplicationWindow(Adw.ApplicationWindow):
             self.root_stack.remove(self.root_stack.get_child_by_name('transaction'))
         
         def submit_callback(button, *args):
-            action = submit_callback.get_name()
-            print(action)
+            def pin_entry_back(*args):
+                self.root_stack.set_visible_child_name('transaction')
+                self.root_stack.remove(self.root_stack.get_child_by_name('pin_entry'))
+            
+            def pin_entry_submit(*args):
+                pin = self.root_stack.get_child_by_name('pin_entry').pinentry_view_entry_row.get_text()
+                address_type = self.root_stack.get_child_by_name('transaction').address_widget.get_name()
+                address = self.root_stack.get_child_by_name('transaction').address_widget.get_text()
+                amount = self.root_stack.get_child_by_name('transaction').transaction_view_amount.get_text()
+                remark = self.root_stack.get_child_by_name('transaction').transaction_view_remark.get_text()
+                type = button.get_name()
 
-        transaction = TransactionView(button.get_child().get_label(), button.get_name(), Gtk.Box(), cancel_and_back_callback, submit_callback)
+                if (remark == None) or (remark == ''):
+                    remark = '1'
+                self.root_stack.set_visible_child_name('processing')
+
+                def wrapped_in_a_thread(type, address, address_type, pin, amount, remark):
+                    service = self.get_application().upi_service
+                    print(type)
+                    if type == 'send':
+                        print(address_type)
+                        if address_type == 'number':
+                            result = service.send_money_to_number(address, amount, pin, remark)
+                        elif address_type == 'id':
+                            result = service.send_money_to_upi_id(address, amount, pin, remark)
+                    self.root_stack.add_named(SuccessView("Name: {}, RefId: {}".format(result['name'], result['refid']),  lambda x: self.root_stack.remove(self.root_stack.get_child_by_name('success'))), 'success')
+                    self.root_stack.set_visible_child_name('success')
+
+                    # Cleanup
+                    self.root_stack.remove(self.root_stack.get_child_by_name('pin_entry'))
+                    self.root_stack.remove(self.root_stack.get_child_by_name('transaction'))
+                
+                threading.Thread(target=wrapped_in_a_thread, args=(type, address, address_type, pin, amount, remark)).start()
+
+            action = button.get_name()
+            self.root_stack.add_named(PinEntry(pin_entry_back, pin_entry_submit), 'pin_entry')
+            self.root_stack.set_visible_child_name('pin_entry')
+
+
+        
+        selected_row =  self.main_view_home_options_list.get_selected_row()
+        name = selected_row.get_name()
+        title = selected_row.get_title()
+
+        if name == 'number':
+            input_purpose = Gtk.InputPurpose.DIGITS
+        elif name == 'id':
+            input_purpose = Gtk.InputPurpose.EMAIL
+
+        transaction = TransactionView(button.get_child().get_label(), button.get_name(), NormalWidget(name, title, input_purpose), cancel_and_back_callback, submit_callback)
         self.root_stack.add_named(transaction, 'transaction')
         self.root_stack.set_visible_child_name('transaction')
 
-        """ option_selected = self.main_view_home_options_list.get_selected_row().get_name()
-        if option_selected == 'id':
-            address_row = Adw.EntryRow(input_purpose=Gtk.InputPurpose.EMAIL)
-            address_row.set_name("address")
-            address_row.set_title("UPI ID")
-            self.transaction_view_input_group.add(address_row)
-        if option_selected == 'number':
-            address_row = Adw.EntryRow(input_purpose=Gtk.InputPurpose.DIGITS)
-            address_row.set_name("address")
-            address_row.set_title("Phone Number")
-            self.transaction_view_input_group.add(address_row) """
     
     def handle_home_check_balance(self, row, *data):
         spinner = Gtk.Spinner()
