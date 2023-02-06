@@ -1,5 +1,5 @@
 from gi.repository import Gtk, Gio, Adw
-from dasbus.error import DBusError
+from dbus.exceptions import DBusException
 import threading
 
 from .pin_entry import PinEntry
@@ -153,7 +153,7 @@ class ApplicationWindow(Adw.ApplicationWindow):
                     self.main_view_home_balance_row.remove(self.main_view_home_balance_row.child_widget)
                     self.main_view_home_balance_row.child_widget = label
                     self.main_view_home_balance_row.add_suffix(self.main_view_home_balance_row.child_widget)
-                except DBusError:
+                except DBusException:
                     print('dbus exception happened')
                     self.main_view_home_balance_row.remove(self.main_view_home_balance_row.child_widget)
                     

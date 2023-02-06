@@ -10,7 +10,7 @@
         "--socket=fallback-x11",
         "--device=dri",
         "--socket=wayland",
-        "--socket=system-bus",
+        "--socket=session-bus",
         "--system-talk-name=org.freedesktop.ModemManager1"
     ],
     "cleanup" : [
@@ -37,7 +37,7 @@
              ]
         },
 
-        "python3-dasbus.json",
+        "dbus-python.json",
 
         {
             "name" : "pe",

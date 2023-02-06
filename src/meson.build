@@ -29,6 +29,11 @@ python = import('python')
 conf = configuration_data()
 conf.set('PYTHON', python.find_installation('python3').path())
 conf.set('VERSION', meson.project_version())
+if get_option('profile') == 'testing'
+  conf.set('TESTING', '1')
+else
+  conf.set('TESTING', '0')
+endif
 conf.set('localedir', join_paths(get_option('prefix'), get_option('localedir')))
 conf.set('pkgdatadir', pkgdatadir)
 
@@ -45,6 +50,7 @@ pe_sources = [
   'main.py',
   'window.py',
   'utils.py',
+  'utils_testing.py',
   'pin_entry.py',
   'success_view.py',
   'transaction_view.py',

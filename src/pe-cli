@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 from argparse import ArgumentParser
-from dasbus.connection import SystemMessageBus
+import dbus
 from time import sleep
-from utils import Service, list_modems, create_ussd_iface
 
 # Argument parsing ----------------------
 ap = ArgumentParser('pe-cli', description="Use NPCI's USSD UPI service via Modem")
@@ -20,12 +19,16 @@ ap.add_argument("--modem", '-m', metavar='1', help="Modem to use (not required i
 ap.add_argument("--determine-digits", '-d', action='store_true', help="Determine number of digits in PIN")
 ap.add_argument("--information-profile", '-i', action='store_true', help="Print information of profile")
 ap.add_argument("--log", action='store_true', help="Log responses of USSD to STDERR")
+ap.add_argument("--testing", '-t', action='store_true', help='Use testing utils to not actually do any payments')
 # ---------------------------------
 
 def main():
-    bus = SystemMessageBus()
+    bus = dbus.SystemBus()
     args = ap.parse_args()
-
+    if args.testsing:
+        from utils_testing import Service, list_modems, create_ussd_iface
+    else:
+        from utils import Service, list_modems, create_ussd_iface
     modems = list_modems(bus)
 
     if args.log:
