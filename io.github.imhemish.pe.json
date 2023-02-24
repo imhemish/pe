@@ -43,6 +43,7 @@
             "name" : "pe",
             "builddir" : true,
             "buildsystem" : "meson",
+            "config-opts": ["-Dprofile=default"],
             "sources" : [
                 {
                     "type" : "dir",
