@@ -1,0 +1,23 @@
+using Gtk 4.0;
+using Adw 1;
+
+template ApplicationWindow : Adw.ApplicationWindow {
+  title: "Pe";
+  Gtk.Stack root_stack {
+    transition-duration: 200;
+    transition-type: slide_left_right;
+    
+            Gtk.StackPage processing_view {
+              name: "processing";
+              child: Gtk.WindowHandle{
+              Adw.StatusPage {
+                title: "Processing";
+                Gtk.Spinner processing_view_spinner {
+                  valign: center;
+                  visible: true;
+                  spinning: true;
+                }
+              }};
+            }
+  }
+} 

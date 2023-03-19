@@ -1,0 +1,138 @@
+using Gtk 4.0;
+using Adw 1;
+
+Gtk.Box main_view_box{
+  vexpand: true;
+  orientation: vertical;
+
+  Adw.HeaderBar main_view_headerbar {
+      centering-policy: strict;
+      title-widget: Adw.ViewSwitcherTitle main_view_switcher_title {
+        title: "Pe";
+        stack: main_view_stack;
+      };
+      
+      [end]
+      .MenuButton {}
+
+  }
+
+
+  Adw.ViewStack main_view_stack {
+    margin-start: 5;
+    margin-end: 5;
+
+    vexpand: true;
+
+    Adw.ViewStackPage main_view_home {
+      name: "home";
+      title: "Home";
+      icon-name: 'user-home-symbolic';
+      child: Adw.ToastOverlay main_view_home_overlay {
+
+        Adw.PreferencesPage {
+          Adw.PreferencesGroup {
+            Adw.ActionRow main_view_home_balance_row {
+              activatable: true;
+              title: "Check Balance";
+              icon-name: "accessories-calculator-symbolic";
+            }
+          }
+
+
+          Adw.PreferencesGroup {
+            Gtk.ListBox main_view_home_options_list{
+              selection-mode: browse;
+
+              styles ["boxed-list"]
+              Adw.ActionRow main_view_home_option_id{
+                name: "id";
+                icon-name: "mail-send-symbolic";
+                title: "UPI ID";
+                }
+              Adw.ActionRow {
+                name: "number";
+                title: "Phone Number";
+                
+                icon-name: "input-dialpad-symbolic";
+              }
+              /*Adw.ActionRow {
+                name: "contact";
+                title: "Contact";
+                icon-name: "x-office-address-book-symbolic";
+              }*/
+              Adw.ActionRow {
+                name: "beneficiary";
+                title: "Saved Beneficiary";
+                icon-name: "view-list-symbolic";
+              }
+              Adw.ActionRow main_view_home_bank_account_row{
+                name: "bank";
+                title: "Bank Account";
+                icon-name: "bank-symbolic";
+              }
+            }
+          }
+
+
+          Adw.PreferencesGroup {
+            Gtk.Box {
+              spacing: 10;
+              orientation: horizontal;
+              hexpand: true;
+              halign: center;
+
+              Gtk.Button main_view_home_send{
+                halign: start;
+                name: "send";
+                styles ["pill", "suggested-action"]
+                child: Adw.ButtonContent {
+                  label: "Send";
+                  icon-name: "go-up-symbolic";
+                };
+              }
+
+              Gtk.Button main_view_home_receive {
+                halign: end;
+                name: "receive";
+                styles ["pill", "suggested-action"]
+                child: Adw.ButtonContent {
+                  label: "Receive";
+                  icon-name: "go-down-symbolic";
+                };
+              }
+            }
+          }
+
+
+
+        }
+      };
+    }
+
+        
+
+    Adw.ViewStackPage main_view_transactions {
+      name: "transactions";
+      title: "Transactions";
+      icon-name: "mail-send-receive-symbolic";
+      child: Adw.ToastOverlay {};
+    }
+
+    Adw.ViewStackPage main_view_profile {
+      name: "profile";
+      title: "Profile";
+      icon-name: 'system-users-symbolic';
+      child: Gtk.Label {
+      label: "Page 3";
+      };
+    }
+                
+  }
+  
+  Adw.ViewSwitcherBar main_view_switcher {
+    valign: end;
+    stack: main_view_stack;
+    reveal: bind main_view_switcher_title.title-visible;
+  }
+}

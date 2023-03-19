@@ -1,0 +1,34 @@
+using Gtk 4.0;
+using Adw 1;
+
+template SuccessView : Gtk.Box {
+    Gtk.Box {
+        orientation: vertical;
+        vexpand: true;
+
+        Adw.HeaderBar {
+            centering-policy: strict;
+            name: "UPI";
+
+            Gtk.Button success_view_back_button {
+              icon-name: "go-previous-symbolic";
+            }
+
+            [end]
+            .MenuButton {}
+        }
+
+              
+        Gtk.Box {
+            vexpand: true;
+            hexpand: true;
+            halign: center;
+
+            Adw.StatusPage success_view_status {
+                icon-name: "emblem-default-symbolic";
+                title: "Success";
+            }
+        }
+    }
+
+}

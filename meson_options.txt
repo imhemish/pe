@@ -1,0 +1,10 @@
+option(
+  'profile',
+  type: 'combo',
+  choices: [
+    'testing',
+    'default'
+  ],
+  value: 'default',
+  description: 'The build profile. One of "default" or "testing".'
+)

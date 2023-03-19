@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gresources>
+  <gresource prefix="/net/hemish/pe">
+    <file>ui/main_view.ui</file>
+    <file>ui/about.ui</file>
+    <file>ui/gui.ui</file>
+    <file>ui/pin_entry.ui</file>
+    <file>ui/success_view.ui</file>
+    <file>ui/transaction_view.ui</file>
+    <file>ui/menu_button.ui</file>
+  </gresource>
+</gresources>

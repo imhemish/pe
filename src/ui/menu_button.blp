@@ -1,0 +1,10 @@
+using Gtk 4.0;
+
+menu menu {
+    item ("About Pe", "app.about")
+}
+
+template MenuButton : Gtk.MenuButton {
+    menu-model: menu;
+    icon-name: "open-menu-symbolic";
+}

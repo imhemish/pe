@@ -1,0 +1,118 @@
+#!/usr/bin/env python3
+from argparse import ArgumentParser
+import dbus
+from time import sleep
+
+# Argument parsing ----------------------
+ap = ArgumentParser('pe-cli', description="Use NPCI's USSD UPI service via Modem")
+ap.add_argument("--send", '-s', action='store_true', required=False, help="Send Money")
+ap.add_argument("--receive", '-r', action='store_true', required=False, help="Receive Money")
+ap.add_argument("--address", '-a', metavar='upi/number', required=False, nargs=1, help="UPI ID or number to send/receive from")
+ap.add_argument("--amount", '-A', metavar='100', nargs=1, required=False, help="Amount of money to send/receive")
+ap.add_argument("--pin", '-p', metavar='****', nargs=1, required=False, help="UPI pin")
+ap.add_argument("--remark", "-R", metavar='"babe this is for you"', nargs=1, required=False, help="Remark to add (optional)")
+ap.add_argument("--balance", '-b', action='store_true', help="Print remaining balance (requires PIN)")
+ap.add_argument("--pending-request", '-P', action='store_true', help="Print last pending request with receiver and amount")
+ap.add_argument("--reject-request", action='store_true', help="Reject last pending request")
+ap.add_argument("--list-modems", '-l', action='store_true', help="List all available modems")
+ap.add_argument("--modem", '-m', metavar='1', help="Modem to use (not required if there is only 1 modem)", nargs=1)
+ap.add_argument("--determine-digits", '-d', action='store_true', help="Determine number of digits in PIN")
+ap.add_argument("--information-profile", '-i', action='store_true', help="Print information of profile")
+ap.add_argument("--log", action='store_true', help="Log responses of USSD to STDERR")
+ap.add_argument("--testing", '-t', action='store_true', help='Use testing utils to not actually do any payments')
+# ---------------------------------
+
+def main():
+    bus = dbus.SystemBus()
+    args = ap.parse_args()
+    if args.testsing:
+        from utils_testing import Service, list_modems, create_ussd_iface
+    else:
+        from utils import Service, list_modems, create_ussd_iface
+    modems = list_modems(bus)
+
+    if args.log:
+        log = True
+    else:
+        log = False
+    
+    # List modems if asked
+    if args.list_modems:
+        for item in modems:
+            print(item)
+        exit() # Because if there is no modem, and user just wants to see if there is a modem or not, next block of code which chooses modem, fails raising an exception
+
+    # If there is only 1 modem, then use it, else use the one specified by --modem flag
+    if len(modems) == 1:
+        modem = modems[0]
+    else:
+        if args.modem == None:
+            raise Exception("no modem specified")
+        else:
+            modem = args.modem[0]
+
+    ussd = create_ussd_iface(modem)
+
+    service = Service(ussd, log)
+
+    if args.send:
+        # Send money
+
+        if args.remark == None:
+            remark = '1'
+        else:
+            remark = args.remark[0]
+
+        if args.address != None:
+            # Is a 10 digit mobile number
+            if str(args.address[0]).isdigit():
+                if len(args.address[0]) == 10:
+                    print(service.send_money_to_number(args.address[0], args.amount[0], args.pin[0], remark))
+                else:
+                    raise Exception("not 10 digits")
+            if "@" in str(args.address[0]):
+                print(service.send_money_to_upi_id(args.address[0], args.amount[0], args.pin[0], remark ))
+                
+        else:
+            raise Exception("Address not provided")
+    
+    elif args.receive:
+        # Make a receive request
+        if args.remark == None:
+            remark = '1'
+        else:
+            remark = args.remark[0]
+
+        if args.address != None:
+            # Is a 10 digit mobile number
+            if str(args.address[0]).isdigit():
+                if len(args.address[0]) == 10:
+                    print(service.receive_from_phone_number(args.address[0], args.amount[0], remark))
+                else:
+                    raise Exception("not 10 digits")
+            if "@" in str(args.address[0]):
+                print(service.receive_from_upi_id(args.address[0], args.amount[0], remark ))
+                
+        else:
+            raise Exception("Address not provided")
+    elif args.balance:
+        if args.pin == None:
+            raise Exception("pin not provided")
+        else:
+            print(service.check_balance(args.pin[0]))
+    
+    elif args.determine_digits:
+        print(service.determine_digits_in_pin())
+
+    elif args.information_profile:
+        print(service.profile_information())
+
+    
+    if args.pending_request:
+        print(service.last_pending_request())
+    if args.reject_request:
+        print(service.reject_last_pending_request())
+    
+
+if __name__ == "__main__":
+    main()

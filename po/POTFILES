@@ -1,0 +1,10 @@
+data/net.hemish.pe.desktop.in
+data/net.hemish.pe.appdata.xml.in
+data/net.hemish.pe.gschema.xml
+src/ui/about.blp
+src/ui/gui.blp
+src/ui/main_view.blp
+src/ui/menu_button.blp
+src/ui/pin_entry.blp
+src/ui/success_view.blp
+src/ui/transaction_view.blp
