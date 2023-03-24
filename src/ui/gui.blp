@@ -2,22 +2,96 @@ using Gtk 4.0;
 using Adw 1;
 
 template ApplicationWindow : Adw.ApplicationWindow {
+
   title: "Pe";
+
   Gtk.Stack root_stack {
     transition-duration: 200;
     transition-type: slide_left_right;
     
-            Gtk.StackPage processing_view {
-              name: "processing";
-              child: Gtk.WindowHandle{
-              Adw.StatusPage {
-                title: "Processing";
-                Gtk.Spinner processing_view_spinner {
-                  valign: center;
-                  visible: true;
-                  spinning: true;
+    Gtk.StackPage processing_view {
+      name: "processing";
+      child: Gtk.WindowHandle{
+        Adw.StatusPage {
+          title: "Processing";
+          Gtk.Spinner processing_view_spinner {
+            valign: center;
+            visible: true;
+            spinning: true;
+          }
+        }
+      };
+    }
+
+    Gtk.StackPage leaflet_view {
+      name: "leaflet";
+      child: Adw.Leaflet leaflet {
+        can-unfold: false;
+        can-navigate-back: true;
+        can-navigate-forward: false;
+        vexpand: true;
+        hexpand: true;
+
+
+          Adw.LeafletPage {
+            name: "transaction";
+            child: Gtk.Box {
+              orientation: vertical;
+              vexpand: true;
+
+              Adw.HeaderBar {
+              centering-policy: strict;
+              name: "Pe";
+
+              Gtk.Button transaction_view_back_button {
+                  tooltip-text: "Go Back";
+                  icon-name: "go-previous-symbolic";
+              }
+
+              [end]
+              .MenuButton {}
+
+              }
+
+              Adw.PreferencesPage {
+
+                Adw.PreferencesGroup transaction_view_input_group {
+
+                    Adw.EntryRow transaction_view_amount {
+                        title: "Amount";
+                        input-purpose: number;
+                        tooltip-text: "Amount";
+                    }
+
+                    Adw.EntryRow transaction_view_remark{
+                      title: "Remark";
+                      input-purpose: free_form;
+                      tooltip-text: "Remark";
+                    }
                 }
-              }};
-            }
+
+                Adw.PreferencesGroup {
+                  Gtk.Box {
+                    spacing: 24;
+                    halign: center;
+                    hexpand: true;
+                    orientation: horizontal;   
+
+                    Gtk.Button transaction_view_send_receive { 
+                        name: 'send_receive';
+                        styles ["pill", "suggested-action"]
+
+                        /* Would be  changed to either 'Send' or 'Receive' in code*/
+                        label: "Send/Receive";
+                    }
+                  } 
+                }
+              
+              }
+
+            };
+          }
+        };
+      }
   }
-} 
+}

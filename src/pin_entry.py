@@ -1,13 +1,37 @@
 from gi.repository import Gtk, Adw
-from .menu_button import MenuButton
 
-@Gtk.Template(resource_path='/net/hemish/pe/ui/pin_entry.ui')
-class PinEntry(Gtk.Box):
-    __gtype_name__ = "PinEntry"
-    pinentry_view_entry_row: Adw.PasswordEntryRow = Gtk.Template.Child()
-    pinentry_view_back_button: Gtk.Button = Gtk.Template.Child()
-
-    def __init__(self, back_connect, apply_connect):
+class PinEntry(Adw.MessageDialog):
+    def __init__(self, parent, ok_callback, cancel_callback = None, digits = None):
         super().__init__()
-        self.pinentry_view_back_button.connect('clicked', back_connect)
-        self.pinentry_view_entry_row.connect('apply', apply_connect)
+
+        self.set_heading("Enter PIN")
+
+        self.cancel_callback = cancel_callback
+        self.ok_callback = ok_callback
+
+        self.pin_entry: Gtk.PasswordEntry = Gtk.PasswordEntry()
+
+        if digits != None:
+            self.pin_entry.set_placeholder_text("*"*digits)
+
+        self.set_extra_child(self.pin_entry)
+
+        self.add_response("ok", "OK")
+        self.add_response("cancel", "Cancel")
+
+        self.set_default_response("ok")
+        self.set_close_response("cancel")
+
+        self.connect("response", self.handle_reponses)
+
+        self.set_transient_for(parent)
+        self.present()
+    
+    def handle_reponses(self, dialog, response):
+        print(response)
+        if response == 'ok':
+            print("calling ok callback")
+            self.ok_callback(self.pin_entry.get_text())
+        if response == 'cancel':
+            if self.cancel_callback:
+                self.cancel_callback()
