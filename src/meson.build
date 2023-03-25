@@ -34,10 +34,21 @@ endif
 conf.set('localedir', join_paths(get_option('prefix'), get_option('localedir')))
 conf.set('pkgdatadir', pkgdatadir)
 
+conf_for_cli = configuration_data()
+conf_for_cli.set('pkgdatadir', pkgdatadir)
+
 configure_file(
   input: 'pe.in',
   output: 'pe',
   configuration: conf,
+  install: true,
+  install_dir: get_option('bindir')
+)
+
+configure_file(
+  input: 'pe-cli.in',
+  output: 'pe-cli',
+  configuration: conf_for_cli,
   install: true,
   install_dir: get_option('bindir')
 )

@@ -2,6 +2,11 @@
 from argparse import ArgumentParser
 import dbus
 from time import sleep
+import sys
+
+pkgdatadir = '@pkgdatadir@'
+
+sys.path.insert(1, pkgdatadir)
 
 # Argument parsing ----------------------
 ap = ArgumentParser('pe-cli', description="Use NPCI's USSD UPI service via Modem")
@@ -25,10 +30,10 @@ ap.add_argument("--testing", '-t', action='store_true', help='Use testing utils 
 def main():
     bus = dbus.SystemBus()
     args = ap.parse_args()
-    if args.testsing:
-        from utils_testing import Service, list_modems, create_ussd_iface
+    if args.testing:
+        from .utils_testing import Service, list_modems, create_ussd_iface
     else:
-        from utils import Service, list_modems, create_ussd_iface
+        from .utils import Service, list_modems, create_ussd_iface
     modems = list_modems(bus)
 
     if args.log:
