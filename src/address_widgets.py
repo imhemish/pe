@@ -1,5 +1,9 @@
+# Address widgets to be used in Transaction View
+# like UPI ID entry row, phone number entry row
+
 from gi.repository import Gtk, Adw
 
+# a common widget for UPI ID entry row and phone number entry row
 class NormalWidget(Adw.EntryRow):
     def __init__(self, name, title, input_purpose):
         super().__init__()

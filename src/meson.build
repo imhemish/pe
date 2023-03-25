@@ -7,7 +7,6 @@ blueprints = custom_target('blueprints',
     'ui/main_view.blp',
     'ui/gui.blp',
     'ui/about.blp',
-    'ui/success_view.blp',
     'ui/menu_button.blp'
   ),
   output: '.',
@@ -50,7 +49,6 @@ pe_sources = [
   'utils.py',
   'utils_testing.py',
   'pin_entry.py',
-  'success_view.py',
   'menu_button.py',
   'address_widgets.py'
 ]

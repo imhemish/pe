@@ -4,9 +4,6 @@
     <file>ui/main_view.ui</file>
     <file>ui/about.ui</file>
     <file>ui/gui.ui</file>
-    <file>ui/pin_entry.ui</file>
-    <file>ui/success_view.ui</file>
-    <file>ui/transaction_view.ui</file>
     <file>ui/menu_button.ui</file>
   </gresource>
 </gresources>
