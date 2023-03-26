@@ -31,9 +31,9 @@ def main():
     bus = dbus.SystemBus()
     args = ap.parse_args()
     if args.testing:
-        from .utils_testing import Service, list_modems, create_ussd_iface
+        from pe.utils_testing import Service, list_modems, create_ussd_iface
     else:
-        from .utils import Service, list_modems, create_ussd_iface
+        from pe.utils import Service, list_modems, create_ussd_iface
     modems = list_modems(bus)
 
     if args.log:
