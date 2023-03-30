@@ -1,7 +1,7 @@
 from gi.repository import Gtk, Adw
 
 class PinEntry(Adw.MessageDialog):
-    def __init__(self, parent, ok_callback, cancel_callback = None, digits = None):
+    def __init__(self, parent, ok_callback, cancel_callback = None, ok_label = "OK", digits = None):
         super().__init__()
 
         self.set_heading("Enter PIN")

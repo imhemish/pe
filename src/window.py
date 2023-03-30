@@ -8,8 +8,6 @@ from .pin_entry import PinEntry
 # that it can be reused by both, and I dont have to duplicate it in both
 from .menu_button import MenuButton
 
-from .address_widgets import NormalWidget
-
 @Gtk.Template(resource_path='/net/hemish/pe/ui/gui.ui')
 class ApplicationWindow(Adw.ApplicationWindow):
     __gtype_name__ = "ApplicationWindow"
@@ -17,9 +15,10 @@ class ApplicationWindow(Adw.ApplicationWindow):
     leaflet: Adw.Leaflet = Gtk.Template.Child()
     transaction_view_send_receive: Gtk.Button = Gtk.Template.Child()
     transaction_view_amount = Gtk.Template.Child()
-    transaction_view_input_group: Gtk.Box = Gtk.Template.Child()
+    transaction_view_input_group: Adw.PreferencesGroup = Gtk.Template.Child()
+    transaction_view_id: Adw.EntryRow = Gtk.Template.Child()
+    transaction_view_number: Adw.EntryRow = Gtk.Template.Child()
     transaction_view_remark = Gtk.Template.Child()
-    transaction_view_back_button = Gtk.Template.Child()
     success_view_status = Gtk.Template.Child()
 
     def __init__(self, *args, **kwargs):
@@ -115,24 +114,87 @@ class ApplicationWindow(Adw.ApplicationWindow):
 
     #----------------------------------------#
     #------- send/receive handling ----------#
+
+    # Called when either send or receive button is pressed in main view
     def handle_home_send_receive(self, button: Gtk.Button):
 
+        action = button.get_name()
+        identifier_type = self.main_view_home_options_list.get_selected_row().get_name()
+        print(identifier_type)
+        self._handle_send_receive(action, identifier_type)
+
+
+    # Meta send/receive function which can be used by gui, or cli upi:// link passing
+    def _handle_send_receive(self, action, identifier_type, identifier_raw = None):
+        # identifier_raw is optional, it may be provided or not
+        # identifier_type can be one of 'number', 'id', etc.
+        # while identifer_raw is the actua id or number like 94XXXXXXXX
+        
         # First setting label and name of buttons of transaction view
         # according to which button of main view is pressed
 
-        self.transaction_view_send_receive.set_name(button.get_name())
+        self.transaction_view_send_receive.set_name(action)
 
         # used button.get_child().get_label() because button has child Adw.ButtonContent 
         # which has label, and not button
-        self.transaction_view_send_receive.set_label(button.get_child().get_label())
+        if action == 'send':
+            self.transaction_view_send_receive.get_child().set_label("Send")
+        else: 
+            self.transaction_view_send_receive.get_child().set_label("Receive")
+        
+        if identifier_type == 'id':
+            self.transaction_view_input_group.active_identifier = self.transaction_view_id
+            self.transaction_view_id.show()
+            self.transaction_view_number.hide()
+            if identifier_raw != None:
+                self.transaction_view_id.set_text(identifier_raw)
+        elif identifier_type == 'number':
+            self.transaction_view_input_group.active_identifier = self.transaction_view_number
+            self.transaction_view_id.hide()
+            self.transaction_view_number.show()
+            if identifier_raw != None:
+                self.transaction_view_number.set_text(identifier_raw)
 
         self.leaflet.set_visible_child_name('transaction_view')
+
+    # The callback which handles the 'actual' send/receive when either 
+    # of the button is clicked
+    """ def submit_send_receive(self, button):
+        service = self.get_application().upi_service
+
+        def submit(pin):
+            if button.name == 'send':
+                if self.transaction_view_input_group.active_identifier.get_name() == 'id':
+                    service.send_money_to_upi_id
+
+                elif self.transaction_view_input_group.active_identifier.get_name() == 'number':
+
+            elif button.name == 'receive':
+                if self.transaction_view_input_group.active_identifier.get_name() == 'id':
+
+                elif self.transaction_view_input_group.active_identifier.get_name() == 'number':
+
+
+        amount = self.transaction_view_amount.get_text()
+        remark = self.transaction_view_remark.get_text()
+        if remark == '' or remark == None:
+            remark = 1 """
+
+
+
+
+        
+        
+        
+        
+
     
     #----------------------------------------#
     #----------------------------------------#
 
         
-    
+    # Is used to make an action, which is then resued in .blp 
+    # files for navigation via back button in headerbar
     def go_back_to_main_view(self, *args):
         self.root_stack.set_visible_child_name("leaflet")
         self.leaflet.set_visible_child_name('main_view')

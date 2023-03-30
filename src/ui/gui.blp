@@ -69,7 +69,7 @@ template ApplicationWindow : Adw.ApplicationWindow {
               centering-policy: strict;
               name: "Pe";
 
-              Gtk.Button transaction_view_back_button {
+              Gtk.Button {
                   tooltip-text: "Go Back";
                   icon-name: "go-previous-symbolic";
                   action-name: "win.go_back_to_main_view";
@@ -84,17 +84,29 @@ template ApplicationWindow : Adw.ApplicationWindow {
 
                 Adw.PreferencesGroup transaction_view_input_group {
 
-                    Adw.EntryRow transaction_view_amount {
-                        title: "Amount";
-                        input-purpose: number;
-                        tooltip-text: "Amount";
-                    }
+                  Adw.EntryRow transaction_view_id {
+                    title: "UPI ID";
+                    input-purpose: email;
+                    tooltip-text: "UPI ID";
+                  }
 
-                    Adw.EntryRow transaction_view_remark{
-                      title: "Remark";
-                      input-purpose: free_form;
-                      tooltip-text: "Remark";
-                    }
+                  Adw.EntryRow transaction_view_number {
+                    title: "Phone Number";
+                    input-purpose: number;
+                    tooltip-text: "Phone Number";
+                  }
+
+                  Adw.EntryRow transaction_view_amount {
+                      title: "Amount";
+                      input-purpose: number;
+                      tooltip-text: "Amount";
+                  }
+
+                  Adw.EntryRow transaction_view_remark{
+                    title: "Remark";
+                    input-purpose: free_form;
+                    tooltip-text: "Remark";
+                  }
                 }
 
                 Adw.PreferencesGroup {

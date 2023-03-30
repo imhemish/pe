@@ -66,11 +66,13 @@ Gtk.Box main_view_box{
                 name: "beneficiary";
                 title: "Saved Beneficiary";
                 icon-name: "view-list-symbolic";
+                visible: false;
               }
               Adw.ActionRow main_view_home_bank_account_row{
                 name: "bank";
                 title: "Bank Account";
                 icon-name: "bank-symbolic";
+                visible: false;
               }
             }
           }
@@ -118,12 +120,14 @@ Gtk.Box main_view_box{
       title: "Transactions";
       icon-name: "mail-send-receive-symbolic";
       child: Adw.ToastOverlay {};
+      visible: false;
     }
 
     Adw.ViewStackPage main_view_profile {
       name: "profile";
       title: "Profile";
       icon-name: 'system-users-symbolic';
+      visible: false;
       child: Gtk.Label {
       label: "Page 3";
       };
