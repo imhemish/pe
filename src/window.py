@@ -2,6 +2,17 @@ from gi.repository import Gtk, Gio, Adw
 from dbus.exceptions import DBusException
 import threading
 
+
+# Used as a decorator to run things in the background
+# Picked up from Linux Mint's webapp-manager
+def _async(func):
+    def wrapper(*args, **kwargs):
+        thread = threading.Thread(target=func, args=args, kwargs=kwargs)
+        thread.daemon = True
+        thread.start()
+        return thread
+    return wrapper
+
 from .pin_entry import PinEntry
 
 # Is used by transaction_view, main_view, so I separated it out so
@@ -10,7 +21,11 @@ from .menu_button import MenuButton
 
 @Gtk.Template(resource_path='/net/hemish/pe/ui/gui.ui')
 class ApplicationWindow(Adw.ApplicationWindow):
+
+    # For beginners, __gtype_name__ is used to identify an object template you declared in
+    # UI/BLP files.
     __gtype_name__ = "ApplicationWindow"
+
     root_stack: Gtk.Stack = Gtk.Template.Child()
     leaflet: Adw.Leaflet = Gtk.Template.Child()
     transaction_view_send_receive: Gtk.Button = Gtk.Template.Child()
@@ -55,6 +70,7 @@ class ApplicationWindow(Adw.ApplicationWindow):
 
         self.create_action('go_back_to_main_view', self.go_back_to_main_view)
 
+        self.transaction_view_send_receive.connect('clicked', self.submit_send_receive)
 
 
     #----------------------------------------#
@@ -159,26 +175,49 @@ class ApplicationWindow(Adw.ApplicationWindow):
 
     # The callback which handles the 'actual' send/receive when either 
     # of the button is clicked
-    """ def submit_send_receive(self, button):
+
+    def submit_send_receive(self, button):
         service = self.get_application().upi_service
-
-        def submit(pin):
-            if button.name == 'send':
-                if self.transaction_view_input_group.active_identifier.get_name() == 'id':
-                    service.send_money_to_upi_id
-
-                elif self.transaction_view_input_group.active_identifier.get_name() == 'number':
-
-            elif button.name == 'receive':
-                if self.transaction_view_input_group.active_identifier.get_name() == 'id':
-
-                elif self.transaction_view_input_group.active_identifier.get_name() == 'number':
-
 
         amount = self.transaction_view_amount.get_text()
         remark = self.transaction_view_remark.get_text()
         if remark == '' or remark == None:
-            remark = 1 """
+            remark = 1
+
+        identifier_raw = self.transaction_view_input_group.active_identifier.get_text()
+
+        @_async
+        def submit(pin):
+            # Pin is only required for sending, but I am adding receive handlers also here
+            # though this function would not be called by pin entry in receive scenarious,
+            # i would be calling it manually
+
+            print("button name is ", button.get_name())
+
+            if button.get_name() == 'send':
+                print(self.transaction_view_input_group.active_identifier.get_name())
+                if self.transaction_view_input_group.active_identifier.get_name() == 'id':
+                    print('active identifier is id')
+                    print(service.send_money_to_upi_id(identifier_raw, amount, pin, remark))
+
+                elif self.transaction_view_input_group.active_identifier.get_name() == 'number':
+                    print(service.send_money_to_number(identifier_raw, amount, pin, remark))
+            
+            elif button.get_name() == 'receive':
+                if self.transaction_view_input_group.active_identifier.get_name() == 'id':
+                    print(service.receive_from_upi_id(identifier_raw, amount, remark))
+
+                elif self.transaction_view_input_group.active_identifier.get_name() == 'number':
+                    print(service.receive_from_phone_number(identifier_raw, amount, remark))
+            
+
+
+        if self.transaction_view_send_receive.get_name() == 'send':
+            PinEntry(self, ok_callback=submit)
+
+        elif self.transaction_view_send_receive.get_name() == 'receive':
+            # Pin is not required for receiving
+            submit(None)
 
 
 

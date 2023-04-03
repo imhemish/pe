@@ -2,6 +2,7 @@ from time import sleep
 from xml.etree import ElementTree
 import sys
 import dbus
+import threading
 
 def list_modems(bus):
     modems = []

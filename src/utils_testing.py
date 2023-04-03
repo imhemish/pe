@@ -28,6 +28,7 @@ class Service:
         
     def send_money_to_upi_id(self, id, amount, pin, remark='1'):
         self.clear_requests()
+        print('send request received')
 
         
         return {"name": "name", "refid": "refid"}

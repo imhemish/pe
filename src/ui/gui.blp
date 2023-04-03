@@ -85,12 +85,14 @@ template ApplicationWindow : Adw.ApplicationWindow {
                 Adw.PreferencesGroup transaction_view_input_group {
 
                   Adw.EntryRow transaction_view_id {
+                    name: "id";
                     title: "UPI ID";
                     input-purpose: email;
                     tooltip-text: "UPI ID";
                   }
 
                   Adw.EntryRow transaction_view_number {
+                    name: "number";
                     title: "Phone Number";
                     input-purpose: number;
                     tooltip-text: "Phone Number";
