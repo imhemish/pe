@@ -1,7 +1,7 @@
 using Gtk 4.0;
 using Adw 1;
 
-template ApplicationWindow : Adw.ApplicationWindow {
+template $ApplicationWindow : Adw.ApplicationWindow {
 
   title: "Pe";
 
@@ -21,14 +21,15 @@ template ApplicationWindow : Adw.ApplicationWindow {
 
           Gtk.Button {
             icon-name: "go-previous-symbolic";
-            action-name: "go_back_to_main_view";
+            action-name: "win.go_back_to_main_view";
           }
 
           [end]
-          .MenuButton {}
+          $MenuButton {}
         }
 
         Adw.StatusPage success_view_status {
+          valign: center;
           icon-name: "emblem-default-symbolic";
           title: "Success";
         }
@@ -36,7 +37,7 @@ template ApplicationWindow : Adw.ApplicationWindow {
     }
     
     Gtk.StackPage processing_view {
-      name: "processing";
+      name: "processing_view";
       child: Gtk.WindowHandle{
         Adw.StatusPage {
           title: "Processing";
@@ -76,7 +77,7 @@ template ApplicationWindow : Adw.ApplicationWindow {
               }
 
               [end]
-              .MenuButton {}
+              $MenuButton {}
 
               }
 

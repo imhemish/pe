@@ -1,5 +1,5 @@
 {
-    "id" : "net.hemish.pe",
+    "id" : "net.hemish.pe.Testing",
     "runtime" : "org.gnome.Platform",
     "runtime-version" : "44",
     "sdk" : "org.gnome.Sdk",
@@ -32,7 +32,7 @@
               {
                     "type": "git",
                     "url": "https://gitlab.gnome.org/jwestman/blueprint-compiler",
-                    "tag": "v0.6.0"
+                    "tag": "v0.8.0"
               }
              ]
         },

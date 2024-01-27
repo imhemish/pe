@@ -198,10 +198,10 @@ class ApplicationWindow(Adw.ApplicationWindow):
                 print(self.transaction_view_input_group.active_identifier.get_name())
                 if self.transaction_view_input_group.active_identifier.get_name() == 'id':
                     print('active identifier is id')
-                    print(service.send_money_to_upi_id(identifier_raw, amount, pin, remark))
+                    output = service.send_money_to_upi_id(identifier_raw, amount, pin, remark)
 
                 elif self.transaction_view_input_group.active_identifier.get_name() == 'number':
-                    print(service.send_money_to_number(identifier_raw, amount, pin, remark))
+                    output = service.send_money_to_number(identifier_raw, amount, pin, remark)
             
             elif button.get_name() == 'receive':
                 if self.transaction_view_input_group.active_identifier.get_name() == 'id':
@@ -209,8 +209,10 @@ class ApplicationWindow(Adw.ApplicationWindow):
 
                 elif self.transaction_view_input_group.active_identifier.get_name() == 'number':
                     print(service.receive_from_phone_number(identifier_raw, amount, remark))
-            
+            self.root_stack.set_visible_child_name('success_view')
+            print(output)
 
+        self.root_stack.set_visible_child_name('processing_view')
 
         if self.transaction_view_send_receive.get_name() == 'send':
             PinEntry(self, ok_callback=submit)

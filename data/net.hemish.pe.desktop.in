@@ -4,8 +4,11 @@ Exec=pe
 Icon=net.hemish.pe
 Terminal=false
 Type=Application
-Categories=GTK;
+Categories=GTK;Finance
 StartupNotify=true
+
+# For handling UPI links
+MimeType=x-scheme-handler/upi
 
 # Translators: Do NOT translate or transliterate this text (these are enum types)!
 X-Purism-FormFactor=Workstation;Mobile;

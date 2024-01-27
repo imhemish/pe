@@ -20,9 +20,10 @@ def main(version, testing):
 
     class Application(Adw.Application):
         def __init__(self):
-            super().__init__(application_id=APP_ID, flags=Gio.ApplicationFlags.FLAGS_NONE)
+            super().__init__(application_id=APP_ID, flags=Gio.ApplicationFlags.HANDLES_OPEN)
             self.create_action("about", self.about)
             self.upi_service = Service(create_ussd_iface(list_modems(SystemMessageBus())[0]), True)
+            self.connect('open', self.handle_upi_links)
         
         def about(self, *args):
             about_window = Gtk.Builder().new_from_resource('/net/hemish/pe/ui/about.ui').get_object("about_window")
@@ -41,6 +42,16 @@ def main(version, testing):
             self.add_action(action)
             if shortcuts:
                 self.set_accels_for_action(f"app.{name}", shortcuts)
+        
+        def handle_upi_links(self, application, links, n, hint):
+            # we dont require n (number) field because at a time we would only process one link
+            # hint is mostly unused unless your app has a specific usecase
+
+            # Activate the window of app
+            self.do_activate()
+
+            
+            print(links[0].get_uri())
             
     app = Application()
     return app.run(sys.argv)

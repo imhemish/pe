@@ -23,6 +23,8 @@ class Service:
 
     def send_money_to_number(self, number, amount, pin, remark='1'):
         self.clear_requests()
+
+        sleep(6)
         
         return {"name": "name", "refid": "refid"}
         
@@ -30,17 +32,23 @@ class Service:
         self.clear_requests()
         print('send request received')
 
+        sleep(6)
+
         
         return {"name": "name", "refid": "refid"}
 
     def receive_from_upi_id(self, id, amount, remark='1'):
         self.clear_requests()
 
+        sleep(6)
+
         
         return {"name": "name"}
 
     def receive_from_phone_number(self, number, amount, remark='1'):
         self.clear_requests()
+
+        sleep(6)
 
         return {"name": "name"}
 

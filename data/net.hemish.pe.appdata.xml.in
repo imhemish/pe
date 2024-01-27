@@ -1,13 +1,43 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <component type="desktop">
-	<id>net.hemish.pe.desktop</id>
-	<metadata_license>CC0-1.0</metadata_license>
-	<project_license>GPL-3.0-or-later</project_license>
-	<description>
-	  <p> WIP </p>
-	</description>
-	<custom>
-    	<value key="Purism::form_factor">workstation</value>
-    	<value key="Purism::form_factor">mobile</value>
-  	</custom>
+  <!--Created with jdAppStreamEdit 6.0-->
+  <id>net.hemish.pe</id>
+  <name>Pe</name>
+  <summary>A USSD based UPI client</summary>
+  <developer_name>Hemish</developer_name>
+  <launchable type="desktop-id">net.hemish.pe.desktop</launchable>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>GPL-3.0-or-later</project_license>
+  <description>
+    <p>Pe is an unofficial USSD *99# based UPI client for Linux platforms.</p>
+  </description>
+  <url type="homepage">https://github.com/imhemish/pe</url>
+  <url type="contact">https://hemish.net</url>
+  <url type="vcs-browser">https://github.com/imhemish/pe</url>
+  <categories>
+    <category>GTK</category>
+    <category>Utility</category>
+    <category>Economy</category>
+    <category>Telephony</category>
+    <category>Finance</category>
+  </categories>
+  <supports>
+    <control>pointing</control>
+    <control>keyboard</control>
+    <control>console</control>
+    <control>touch</control>
+  </supports>
+  <content_rating type="oars-1.1"/>
+  <keywords>
+    <keyword>upi</keyword>
+    <keyword>pe</keyword>
+    <keyword>payment</keyword>
+    <keyword>finance</keyword>
+    <keyword>money</keyword>
+    <keyword>india</keyword>
+  </keywords>
+  <custom>
+    <value key="Purism::form_factor">workstation</value>
+    <value key="Purism::form_factor">mobile</value>
+  </custom>
 </component>
